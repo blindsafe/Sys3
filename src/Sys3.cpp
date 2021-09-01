@@ -10,6 +10,7 @@
 #include <iostream>
 #include <IOmanip>
 using namespace std;
+#include "helper.h"
 
 int win_count = 0;
 int win_hidden_count = 0;
@@ -69,6 +70,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hWnd, long lParam) {
 
 int main() {
 	cout << "***List Top Level Windows***" << endl;
+	show_message(MY_MESSAGE);
 
 	SetupKnownWIndows();
 	cout << endl;
