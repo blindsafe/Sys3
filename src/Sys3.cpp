@@ -13,6 +13,7 @@ using namespace std;
 #include "helper.h"
 
 int win_count = 0;
+int win_total = 0;
 int win_hidden_count = 0;
 int win_no_title = 0;
 
@@ -38,14 +39,21 @@ void SetupKnownWIndows() {
 
 BOOL CALLBACK EnumWindowsProc(HWND hWnd, long lParam) {
 	const int N = 256;
-	char buff[N];
-
+	char textbuff[N];
+	char namebuff[N];
+	char marks[] = { ' ', ' ', ' ', ' ', ' ', '\0' };
+	
+	win_total++;
+	GetWindowText(hWnd, (LPSTR) textbuff, sizeof(textbuff) - 1);
+	strcpy(namebuff, "");
+	GetWindowModuleFileName(hWnd, (LPSTR) namebuff, sizeof(namebuff) - 1);
+       
 	if (IsWindowVisible(hWnd)) {
-		GetWindowText(hWnd, (LPSTR) buff, sizeof(buff) - 1);
-		if (strlen(buff) > 0) {
+              
+		marks[3] = 'V';
+		if (strlen(textbuff) > 0) {
 			win_count++;
-
-			char marks[] = { ' ', ' ', ' ', '\0' };
+			marks[4] = 'T';
 			if (hWnd == active_window) {
 				marks[0] = 'A';
 			}
@@ -55,16 +63,20 @@ BOOL CALLBACK EnumWindowsProc(HWND hWnd, long lParam) {
 			if (hWnd == forground_window) {
 				marks[2] = 'G';
 			}
-
-			cout << std::setw(4) << std::dec << win_count << ". " << marks
-					<< setw(10) << std::hex << hWnd << " --> " << buff << endl;
-		} else {
-			win_no_title++;
+		}
+		else {
+			win_no_title++;	
 		}
 	} else {
 		win_hidden_count++;
 	}
-
+	if ( textbuff[0] || namebuff[0] ) {
+		cout << std::setw(4) << std::dec << win_count <<"/" << win_total
+					<< ". " << marks
+					<< setw(10) << std::hex << hWnd 
+					<< " --> " << textbuff 
+					<< " ==> " << namebuff << endl;
+        }
 	return TRUE;
 }
 
