@@ -27,7 +27,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hWnd, long lParam) {
 	strcpy(textbuff, "");
 	GetWindowText(hWnd, (LPSTR) textbuff, sizeof(textbuff) - 1);
 	if (strlen(textbuff) < 1) {
-		strcpy(textbuff, "-- No Window Title --");
+		strcpy(textbuff, "[NO TITLE]");
 	}
 
 	strcpy(namebuff, "");
@@ -37,10 +37,8 @@ BOOL CALLBACK EnumWindowsProc(HWND hWnd, long lParam) {
 	}
 
 	if (IsWindowVisible(hWnd)) {
-		marks[3] = 'V';
 		if (strlen(textbuff) > 0) {
 			wt->win_count++;
-			marks[4] = 'T';
 			if (hWnd == wt->active_window) {
 				marks[0] = 'A';
 			}
@@ -49,6 +47,10 @@ BOOL CALLBACK EnumWindowsProc(HWND hWnd, long lParam) {
 			}
 			if (hWnd == wt->forground_window) {
 				marks[2] = 'G';
+			}
+			marks[3] = 'V';
+			if (IsWindowEnabled(hWnd)) {
+				marks[4] = 'E';
 			}
 		} else {
 			wt->win_no_title++;
