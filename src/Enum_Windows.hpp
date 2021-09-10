@@ -21,6 +21,8 @@ struct Window_Tracking {
 	int win_total = 0;
 	int win_hidden_count = 0;
 	int win_no_title = 0;
+	int win_my_windows = 0;
+	int win_killed_windows = 0;
 
 	/**
 	 * Global variables tracking window status

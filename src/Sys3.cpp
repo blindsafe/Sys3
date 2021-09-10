@@ -34,12 +34,29 @@ int main() {
 	SetupKnownWIndows();
 	cout << endl;
 
+	system("tasklist");	cout << "tasklist at beginning" << endl; system("pause");
+
 	BOOL result = EnumWindows(EnumWindowsProc, 0);
-	cout << endl << "Done with " << std::dec << wtrk.win_count
-			<< " visible windows and " << wtrk.win_hidden_count
-			<< " hidden windows, with " << wtrk.win_no_title
+	cout << endl  << "Done with "<<  result  << "and  " << std::dec << wtrk.win_count
+			<< " visible windows and " <<  wtrk.win_my_windows << " my_windows and "
+			<< wtrk.win_killed_windows << " killed windows and "
+			<< wtrk.win_hidden_count << " hidden windows, with " << wtrk.win_no_title
 			<< " visible windows having no title." << endl;
 	system("pause");
+
+	system("tasklist") ; cout << "tasklist at end of first go" << endl; 	system("pause");
+	cout << "***" << endl;
+
+	// try again to see whats different
+    result = EnumWindows(EnumWindowsProc, 0);
+	cout << endl  << "Done with "<<  result  << "and  " << std::dec << wtrk.win_count
+			<< " visible windows and " <<  wtrk.win_my_windows << " my_windows and "
+			<< wtrk.win_killed_windows << " killed windows and "
+			<< wtrk.win_hidden_count << " hidden windows, with " << wtrk.win_no_title
+			<< " visible windows having no title." << endl;
+	system("pause");
+
+	system("tasklist") ; cout << "tasklist at end of 2nd go" << endl; 	system("pause");
 	cout << "***" << endl;
 
 	return result ? 1 : 0;
