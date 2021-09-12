@@ -15,7 +15,13 @@ using namespace std;
 
 struct Window_Tracking {
 	/*
-	 * Global variables tracking  window counts
+	 * Global variables directing actions
+	 */
+	int list_window = 0;
+	int show_window = 0;
+	int kill_window = 0;
+	  /*
+	  * Global variables tracking  window counts
 	 */
 	int win_count = 0;
 	int win_total = 0;
@@ -23,16 +29,28 @@ struct Window_Tracking {
 	int win_no_title = 0;
 	int win_github_windows = 0;
 	int win_killed_windows = 0;
-
-	/**
+	/*
 	 * Global variables tracking window status
 	 */
 	HWND active_window = 0;
 	HWND focus_window = 0;
 	HWND forground_window = 0;
+	/*
+	 * stuff about the current window
+	 */
+	HWND current_window;
+	int could_kill_window = 0;
+    char textbuff[256];
+	char namebuff[256];
+	char marks[7] = { ' ', ' ', ' ', ' ', ' ',' ', '\0' };
+	int exe_title = 0;
+	int exe_name = 0;
 };
 
-void set_window_tracking(Window_Tracking *wtptr);
+void SetupKnownWindows();
+
+void init_window_tracking(Window_Tracking *wtptr);
+
 
 Window_Tracking* get_window_tracking();
 

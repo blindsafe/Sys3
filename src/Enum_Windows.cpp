@@ -9,8 +9,45 @@
 
 struct Window_Tracking *wt;
 
-void set_window_tracking(Window_Tracking *wtptr) {
+void SetupKnownWIndows() {
+	// One window has the focus -- the one that's first in line to get keyboard events.
+	// The outer window (that the user can drag around the screen) is "active"
+	// if one of its subwindows has the focus, but it might or might not have focus itself.
+
+	wt->active_window = GetActiveWindow(); // top level window associated with focus
+	cout << "   Active Window    : " << std::setw(10) << std::hex
+			<< wt->active_window << endl;
+	wt->focus_window = GetFocus();
+	cout << "   Focus Window     : " << std::setw(10) << std::hex
+			<< wt->focus_window << endl;
+	wt->forground_window = GetForegroundWindow();
+	cout << "   Foreground Window: " << std::setw(10) << std::hex
+			<< wt->forground_window << endl;
+}
+
+void init_window_tracking(Window_Tracking *wtptr) {
 	wt = wtptr;
+	if ( wt->active_window == 0 ) {
+		// first time in
+		 SetupKnownWIndows();
+	}
+	{
+		cout << "INITIALIZE!" << endl;
+		  wt->list_window = 0;
+		  wt->show_window = 0;
+		  wt->kill_window = 0;
+
+		  wt->win_count = 0;
+		  wt->win_total = 0;
+		  wt->win_hidden_count = 0;
+		  wt->win_no_title = 0;
+		  wt->win_github_windows = 0;
+		  wt->win_killed_windows = 0;
+
+		  wt->active_window = 0;
+		  wt->focus_window = 0;
+		  wt->forground_window = 0;
+	}
 }
 
 Window_Tracking* get_window_tracking() {
@@ -58,104 +95,121 @@ int is_exe( char string[]) {
 	// if (rtn ) cout << " yes"; else cout << " no"; cout << endl;
 	return rtn;
 }
-BOOL CALLBACK EnumWindowsProc(HWND hWnd, long lParam) {
-	const int N = 256;
-	char textbuff[N];
-	char namebuff[N];
-	char marks[] = { ' ', ' ', ' ', ' ', ' ',' ', '\0' };
-	char my_window[N];
-	int is_github_window = 0;
-	int kill_window = 0; // various reasons to not kill  window, tested below
-	int has_title = 1; int exe_title = 0;
-	int has_name = 1; int exe_name = 0;
 
-	wt->win_total++;
+void describe_window( HWND hWnd) {
 
-	strcpy(textbuff, "");
-	GetWindowText(hWnd, (LPSTR) textbuff, sizeof(textbuff) - 1);
-	if (strlen(textbuff) < 1) {
-		strcpy(textbuff, "[NO TITLE]"); has_title = 0;
-	} else {
-		exe_title = is_exe(textbuff);
-	}
-    strcpy(namebuff, "");
-	GetWindowModuleFileName(hWnd, (LPSTR) namebuff, sizeof(namebuff) - 1);
-	if (strlen(namebuff) < 1) {
-		strcpy(namebuff, "[NO MODULE]"); has_name = 0;
-	} else {
-		exe_name = is_exe(namebuff);
-	}
+	char my_window[256];
+		int is_github_window = 0;
+		int kill_window = 0; // various reasons to not kill  window, tested below
+		int has_title = 1;
+		int has_name = 1;
 
-	 strcpy(my_window, "C:\\Users\\charlie\\github");
-	 if ( string_begin(textbuff, my_window)) {
-		is_github_window = 1;
-	}
-	 if ( string_begin(namebuff, my_window)) {
-		is_github_window = 1;
-	 }
-	 if (is_github_window) {
-		 wt->win_github_windows++;
-		 marks[5] = 'G';
-	 }
+		wt->current_window = hWnd;
+		strcpy(wt->marks, "      ");
 
-
-	if (IsWindowVisible(hWnd)) {
-		if (strlen(textbuff) > 0) {
-			wt->win_count++;
-			marks[3] = 'V';
-			kill_window = 1;
-			if (hWnd == wt->active_window) {
-				marks[0] = 'A';	kill_window = 0;
+		strcpy(wt->textbuff, "");wt-> exe_title = 0;
+		GetWindowText(hWnd, (LPSTR) wt->textbuff, sizeof(wt->textbuff) - 1);
+			if (strlen(wt->textbuff) < 1) {
+				strcpy(wt->textbuff, "[NO TITLE]"); has_title = 0;
+			} else {
+				wt->exe_title = is_exe(wt->textbuff);
 			}
-			if (hWnd == wt->focus_window) {
-				marks[1] = 'F';	kill_window = 0;
-			}
-			if (hWnd == wt->forground_window) {
-				marks[2] = '*';	kill_window = 0;
+		    strcpy(wt->namebuff, ""); wt->exe_name = 0;
+			GetWindowModuleFileName(hWnd, (LPSTR) wt->namebuff, sizeof(wt->namebuff) - 1);
+			if (strlen(wt->namebuff) < 1) {
+				strcpy(wt->namebuff, "[NO MODULE]"); has_name = 0;
+			} else {
+				wt->exe_name = is_exe(wt->namebuff);
 			}
 
-			if (IsWindowEnabled(hWnd)) {
-				marks[4] = 'E';
+			// special kludge coding for charlie so he doesnt kill github stuff
+			 strcpy(my_window, "C:\\Users\\charlie\\github");
+			 if ( string_begin(wt->textbuff, my_window)) {
+				is_github_window = 1;
 			}
-		} else {
-			wt->win_no_title++;
-		}
-	} else {
-		wt->win_hidden_count++;
-	}
+			 if ( string_begin(wt->namebuff, my_window)) {
+				is_github_window = 1;
+			 }
+			 if (is_github_window) {
+				 wt->win_github_windows++;
+				 wt->marks[5] = 'G';
+			 }
+				if (IsWindowVisible(hWnd)) {
+					if (strlen(wt->textbuff) > 0) {
+						wt->win_count++;
+						wt->marks[3] = 'V';
+						kill_window = 1;
+						if (hWnd == wt->active_window) {
+							wt->marks[0] = 'A';	kill_window = 0;
+						}
+						if (hWnd == wt->focus_window) {
+							wt->marks[1] = 'F';	kill_window = 0;
+						}
+						if (hWnd == wt->forground_window) {
+							wt->marks[2] = '*';	kill_window = 0;
+						}
 
-	// if (has_name || has_title) {
+						if (IsWindowEnabled(hWnd)) {
+							wt->marks[4] = 'E';
+						}
+					} else {
+						wt->win_no_title++;
+					}
+				} else {
+					wt->win_hidden_count++;
+				}
 	if ( is_github_window) {
-	//	cout << "ignoring github window" << endl;
+		 cout << "ignoring github window" << endl;
 		kill_window = 0;
-	}
-	else if ( exe_title || exe_name || kill_window   ) {
-		cout << std::setw(3) << std::dec << wt->win_count << "/" << std::setw(4)
-				<< std::dec << wt->win_total << "." << marks << setw(10)
-				<< std::hex << hWnd << " --> " << textbuff << " ==> "
-				<< namebuff << endl;
-
-		if ( kill_window &&!has_name && !has_title  ) {
-		//	cout << "Why kill this empty  window?";
-			kill_window = 0;
+	 }
+	if ( kill_window ) {
+		if (!has_name && !has_title  ) {
+	   cout << "Why kill this empty  window?";
+		kill_window = 0;
+		}
+		else if (!wt->exe_title && !wt->exe_name) {
+			  cout << "Why kill this  window that's not an exe?";
+				kill_window = 0;
 		}
 	}
+	wt->could_kill_window = kill_window;
+}
 
-	if ( kill_window) {
-		long unsigned int  pid = 0;
-		string filename;
-	//	char syscmd[N] =  " tasklist /svc /FI \"PID eq ";
-		char syscmd[N] =  " taskkill /PID ";
-	    GetWindowThreadProcessId ( hWnd, &pid );
-        filename = to_string(pid);
+void do_window( HWND hWnd) {
+// everything below is about the HWND we have in hand
+	long unsigned int  pid = 0;
+	string filename;
+   GetWindowThreadProcessId ( hWnd, &pid );
+     filename = to_string(pid);
+	if (wt->list_window) {
+		cout << std::setw(3) << std::dec << wt->win_count << "/" << std::setw(4)
+				<< std::dec << wt->win_total << "." <<wt-> marks << setw(10)
+				<< std::hex << hWnd << " --> " << wt->textbuff << " ==> "
+				<< wt->namebuff << endl;
+	}
+	if (wt->show_window ) {
+		char syscmd[256] =  " tasklist /svc /FI \"PID eq ";
 		strcat( syscmd, &filename[0]);
-		strcat(syscmd, " /F");
-		cout << "Kill window " << textbuff << "==" << namebuff << "with"
+		 system( syscmd );
+	}
+
+	if ( wt->kill_window &&	wt->could_kill_window ) {
+			char syscmd[256] =  " taskkill /PID /svc /FI \"PID eq ";
+			strcat( syscmd, &filename[0]);
+			strcat(syscmd, " /F");
+		cout << "Kill window " << wt->textbuff << "==" << wt->namebuff << "with"
 				<< syscmd << endl;
-		system( syscmd );
+		// system( syscmd );
 		wt->win_killed_windows++;
 	}
+}
 
-	return TRUE;
+BOOL CALLBACK EnumWindowsProc(HWND hWnd, long lParam) {
+
+
+	wt->win_total++;
+    describe_window(hWnd);
+	do_window(hWnd);
+return TRUE;
 }
 

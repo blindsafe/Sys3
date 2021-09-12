@@ -11,28 +11,14 @@
 
 struct Window_Tracking wtrk;
 
-void SetupKnownWIndows() {
-	// One window has the focus -- the one that's first in line to get keyboard events.
-	// The outer window (that the user can drag around the screen) is "active"
-	// if one of its subwindows has the focus, but it might or might not have focus itself.
 
-	wtrk.active_window = GetActiveWindow(); // top level window associated with focus
-	cout << "   Active Window    : " << std::setw(10) << std::hex
-			<< wtrk.active_window << endl;
-	wtrk.focus_window = GetFocus();
-	cout << "   Focus Window     : " << std::setw(10) << std::hex
-			<< wtrk.focus_window << endl;
-	wtrk.forground_window = GetForegroundWindow();
-	cout << "   Foreground Window: " << std::setw(10) << std::hex
-			<< wtrk.forground_window << endl;
-}
 
 int main() {
 	cout << "***List Top Level Windows***" << endl;
 
-	set_window_tracking(&wtrk);   // Pointer to global shared variables (sorry, bad!)
-	SetupKnownWIndows();
-	cout << endl;
+	init_window_tracking(&wtrk);   // Pointer to global shared variables (sorry, bad!)
+	wtrk.show_window = 1;
+
 
 	// system("tasklist");	cout << "tasklist at beginning" << endl; system("pause");
 
@@ -44,10 +30,10 @@ int main() {
 			<< " visible windows having no title." << endl;
 	system("pause");
 
-	// system("tasklist") ; cout << "tasklist at end of first go" << endl; 	system("pause");
-	cout << "***" << endl;
 
+	init_window_tracking(&wtrk);   // Pointer to global shared variables (sorry, bad!)
 	// try again to see whats different
+	wtrk.show_window = 1; wtrk.kill_window = 1;
     result = EnumWindows(EnumWindowsProc, 0);
 	cout << endl  << "Done with "<<  result  << "and  " << std::dec << wtrk.win_count
 			<< " visible windows and " <<  wtrk.win_github_windows << " my_windows and "
@@ -56,7 +42,7 @@ int main() {
 			<< " visible windows having no title." << endl;
 	system("pause");
 
-	system("tasklist") ; cout << "tasklist at end of 2nd go" << endl; 	system("pause");
+	// system("tasklist") ; cout << "tasklist at end of 2nd go" << endl; 	system("pause");
 	cout << "***" << endl;
 
 	return result ? 1 : 0;
