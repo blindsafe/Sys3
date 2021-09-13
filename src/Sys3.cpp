@@ -6,25 +6,22 @@
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 
-
 #include "Sys3.hpp"
 
-struct Window_Tracking wtrk;
-
-
+struct Window_Tracking wtrk_old;
 
 int main() {
 	char cmd[BUF_SIZE];
 	int doit = 1;
 
-	while ( doit ) {
-		cout << "your wish is my command" << endl <<  "-->";
+	while (doit) {
+		cout << "your wish is my command" << endl << "-->";
 		cin >> cmd;
 		cout << "you said " << cmd << endl;
 		system("pause");
-		switch ( cmd[0] ) {
-		case 't':  { // tasklist
-			system( "tasklist");
+		switch (cmd[0]) {
+		case 't': { // tasklist
+			system("tasklist");
 			break;
 		}
 		case 'q': { // quit
@@ -35,77 +32,49 @@ int main() {
 			system(cmd);
 			break;
 		}
-		case 'k': case 'l': case 's': case 'r': {
+		case 'k':
+		case 'l':
+		case 's':
+		case 'r': {
 			// kill, list, show, review
-			cout  <<  "review all windows" << endl;
-			init_window_tracking(&wtrk);   // Pointer to global shared variables
-			switch ( cmd[0] ) {  // different options as we tour all the windows
+			cout << "review all windows" << endl;
+			init_window_tracking(&wtrk_old); // Pointer to global shared variables
+			switch (cmd[0]) {  // different options as we tour all the windows
 			case 'k': {  // actually kill it will killtask
-				wtrk.kill_window = 1;
-				break; }
+				wtrk_old.kill_window = 1;
+				break;
+			}
 			case 'l': { // short description
-				wtrk.list_window = 1;
-				break; }
-			case 's' :{ // show, means listtask
-				wtrk.show_window = 1;
-				break; }
+				wtrk_old.list_window = 1;
+				break;
+			}
+			case 's': { // show, means listtask
+				wtrk_old.show_window = 1;
+				break;
+			}
 			case 'r': { // review means show what would be billed
-				wtrk.list_window = 1;
-				wtrk.kill_window = 1;
-				break; }
+				wtrk_old.list_window = 1;
+				wtrk_old.kill_window = 1;
+				break;
+			}
 			}
 			BOOL result = EnumWindows(EnumWindowsProc, 0);
-				cout << endl  << "Done with "<<  result  << "and  " << std::dec << wtrk.win_count
-						<< " visible windows and " <<  wtrk.win_github_windows << " my_windows and "
-						<< wtrk.win_killed_windows << " killed windows and "
-						<< wtrk.win_hidden_count << " hidden windows, with " << wtrk.win_no_title
-						<< " visible windows having no title." << endl;
-				system("pause");
-				break;
+			cout << endl << "Done with " << result << "and  " << std::dec
+					<< wtrk_old.win_count << " visible windows and "
+					<< wtrk_old.win_github_windows << " my_windows and "
+					<< wtrk_old.win_killed_windows << " killed windows and "
+					<< wtrk_old.win_hidden_count << " hidden windows, with "
+					<< wtrk_old.win_no_title
+					<< " visible windows having no title." << endl;
+			system("pause");
+			break;
 		}
 		default: {
-			cout <<  "I don't know what you mean by " << endl;
+			cout << "I don't know what you mean by " << endl;
 			break;
 		}
 		}
 	}
 	cout << "That's all folks!" << endl;
-return 1;
+	return 1;
 }
-
-#if 0 // original test bench
-int main() {
-	cout << "***List Top Level Windows***" << endl;
-
-	init_window_tracking(&wtrk);   // Pointer to global shared variables (sorry, bad!)
-	wtrk.show_window = 1;
-
-
-	// system("tasklist");	cout << "tasklist at beginning" << endl; system("pause");
-
-	BOOL result = EnumWindows(EnumWindowsProc, 0);
-	cout << endl  << "Done with "<<  result  << "and  " << std::dec << wtrk.win_count
-			<< " visible windows and " <<  wtrk.win_github_windows << " my_windows and "
-			<< wtrk.win_killed_windows << " killed windows and "
-			<< wtrk.win_hidden_count << " hidden windows, with " << wtrk.win_no_title
-			<< " visible windows having no title." << endl;
-	system("pause");
-
-
-	init_window_tracking(&wtrk);   // Pointer to global shared variables (sorry, bad!)
-	// try again to see whats different
-	wtrk.show_window = 1; wtrk.kill_window = 1;
-    result = EnumWindows(EnumWindowsProc, 0);
-	cout << endl  << "Done with "<<  result  << "and  " << std::dec << wtrk.win_count
-			<< " visible windows and " <<  wtrk.win_github_windows << " my_windows and "
-			<< wtrk.win_killed_windows << " killed windows and "
-			<< wtrk.win_hidden_count << " hidden windows, with " << wtrk.win_no_title
-			<< " visible windows having no title." << endl;
-	system("pause");
-
-	// system("tasklist") ; cout << "tasklist at end of 2nd go" << endl; 	system("pause");
-	cout << "***" << endl;
-
-	return result ? 1 : 0;
-}
-#endif

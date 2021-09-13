@@ -14,9 +14,6 @@
 
 using namespace std;
 
-
-
 #include "Enum_Windows.hpp"
-
 
 #endif /* SYS3_HPP_ */

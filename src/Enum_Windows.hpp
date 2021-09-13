@@ -23,8 +23,8 @@ struct Window_Tracking {
 	int show_window = 0;
 	int kill_window = 0;   //  1= yes, 2 = just say what you would do
 	int debug_commentary = 0;
-	  /*
-	  * Global variables tracking  window counts
+	/*
+	 * Global variables tracking  window counts
 	 */
 	int win_count = 0;
 	int win_total = 0;
@@ -43,9 +43,9 @@ struct Window_Tracking {
 	 */
 	HWND current_window;
 	int could_kill_window = 0;
-    char textbuff[BUF_SIZE];
+	char textbuff[BUF_SIZE];
 	char namebuff[BUF_SIZE];
-	char marks[7] = { ' ', ' ', ' ', ' ', ' ',' ', '\0' };
+	char marks[7] = { ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
 	int exe_title = 0;
 	int exe_name = 0;
 };
@@ -53,7 +53,6 @@ struct Window_Tracking {
 void SetupKnownWindows();
 
 void init_window_tracking(Window_Tracking *wtptr);
-
 
 Window_Tracking* get_window_tracking();
 
