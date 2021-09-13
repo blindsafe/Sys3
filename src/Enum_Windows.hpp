@@ -13,13 +13,16 @@
 #include <IOmanip>
 using namespace std;
 
+#define BUF_SIZE 256  // universal size for names, commands
+
 struct Window_Tracking {
 	/*
 	 * Global variables directing actions
 	 */
 	int list_window = 0;
 	int show_window = 0;
-	int kill_window = 0;
+	int kill_window = 0;   //  1= yes, 2 = just say what you would do
+	int debug_commentary = 0;
 	  /*
 	  * Global variables tracking  window counts
 	 */
@@ -40,8 +43,8 @@ struct Window_Tracking {
 	 */
 	HWND current_window;
 	int could_kill_window = 0;
-    char textbuff[256];
-	char namebuff[256];
+    char textbuff[BUF_SIZE];
+	char namebuff[BUF_SIZE];
 	char marks[7] = { ' ', ' ', ' ', ' ', ' ',' ', '\0' };
 	int exe_title = 0;
 	int exe_name = 0;

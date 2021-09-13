@@ -14,6 +14,20 @@ struct Window_Tracking wtrk;
 
 
 int main() {
+	char cmd[BUF_SIZE];
+	int doit = 1;
+
+	while ( doit ) {
+		cout << "your wish is my commant" << endl;
+		cin >> cmd;
+		cout << "you said " << cmd << endl;
+		doit = 0;
+	}
+return 1;
+}
+
+#if 0 // original test bench
+int main() {
 	cout << "***List Top Level Windows***" << endl;
 
 	init_window_tracking(&wtrk);   // Pointer to global shared variables (sorry, bad!)
@@ -47,3 +61,4 @@ int main() {
 
 	return result ? 1 : 0;
 }
+#endif

@@ -78,7 +78,7 @@ int is_exe( char string[]) {
 	char exe_string[] = ".exe";
 	char end_string[5];
 	int rtn = 0; int copied_5 = 0;
-	// cout << "--?is_exe(" << std::dec << len << ": " << string << " vs " << exe_string << ".";
+	if ( wt->debug_commentary ) cout << "--?is_exe(" << std::dec << len << ": " << string << " vs " << exe_string << ".";
 	if ( len >= 4 ) {
 		if ( len >= 5 ) {
 			if ( string[len - 1] == ')' ) {
@@ -89,16 +89,18 @@ int is_exe( char string[]) {
 		if ( ! copied_5 ) {
 			strcpy(end_string, &string[len - 4]);
 		}
-		// cout <<  ") with " << end_string << " vs " << exe_string  << ".";
+		if ( wt->debug_commentary ) cout <<  ") with " << end_string << " vs " << exe_string  << ".";
 		if ( strcmp( end_string, exe_string) == 0 ) rtn = 1;
 	}
-	// if (rtn ) cout << " yes"; else cout << " no"; cout << endl;
+	if ( wt->debug_commentary ) {
+		if (rtn ) cout << " yes"; else cout << " no"; cout << endl;
+	}
 	return rtn;
 }
 
 void describe_window( HWND hWnd) {
 
-	char my_window[256];
+	char my_window[BUF_SIZE];
 		int is_github_window = 0;
 		int kill_window = 0; // various reasons to not kill  window, tested below
 		int has_title = 1;
@@ -159,16 +161,16 @@ void describe_window( HWND hWnd) {
 					wt->win_hidden_count++;
 				}
 	if ( is_github_window) {
-		 cout << "ignoring github window" << endl;
+		if ( wt->debug_commentary ) cout << "ignoring github window" << endl;
 		kill_window = 0;
 	 }
 	if ( kill_window ) {
 		if (!has_name && !has_title  ) {
-	   cout << "Why kill this empty  window?";
+			if ( wt->debug_commentary ) cout << "Why kill this empty  window?";
 		kill_window = 0;
 		}
 		else if (!wt->exe_title && !wt->exe_name) {
-			  cout << "Why kill this  window that's not an exe?";
+			if ( wt->debug_commentary ) cout << "Why kill this  window that's not an exe?";
 				kill_window = 0;
 		}
 	}
@@ -188,18 +190,24 @@ void do_window( HWND hWnd) {
 				<< wt->namebuff << endl;
 	}
 	if (wt->show_window ) {
-		char syscmd[256] =  " tasklist /svc /FI \"PID eq ";
+		char syscmd[BUF_SIZE] =  " tasklist /svc /FI \"PID eq ";
 		strcat( syscmd, &filename[0]);
 		 system( syscmd );
 	}
 
 	if ( wt->kill_window &&	wt->could_kill_window ) {
-			char syscmd[256] =  " taskkill /PID /svc /FI \"PID eq ";
+			char syscmd[BUF_SIZE] =  " taskkill /PID /svc /FI \"PID eq ";
 			strcat( syscmd, &filename[0]);
 			strcat(syscmd, " /F");
-		cout << "Kill window " << wt->textbuff << "==" << wt->namebuff << "with"
-				<< syscmd << endl;
-		// system( syscmd );
+			if (wt->debug_commentary ) {
+				cout << "(**)Kill window " << wt->textbuff << "==" << wt->namebuff << "with"
+				<< syscmd << endl; }
+			if ( wt->kill_window == 2) {
+				cout <<"system( " << syscmd << " )" << endl;
+			}
+			else {
+				system( syscmd );
+			}
 		wt->win_killed_windows++;
 	}
 }
