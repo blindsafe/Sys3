@@ -18,11 +18,58 @@ int main() {
 	int doit = 1;
 
 	while ( doit ) {
-		cout << "your wish is my commant" << endl;
+		cout << "your wish is my command" << endl <<  "-->";
 		cin >> cmd;
 		cout << "you said " << cmd << endl;
-		doit = 0;
+		system("pause");
+		switch ( cmd[0] ) {
+		case 't':  { // tasklist
+			system( "tasklist");
+			break;
+		}
+		case 'q': { // quit
+			doit = 0;
+			break;
+		}
+		case 'c': { //cmd
+			system(cmd);
+			break;
+		}
+		case 'k': case 'l': case 's': case 'r': {
+			// kill, list, show, review
+			cout  <<  "review all windows" << endl;
+			init_window_tracking(&wtrk);   // Pointer to global shared variables
+			switch ( cmd[0] ) {  // different options as we tour all the windows
+			case 'k': {  // actually kill it will killtask
+				wtrk.kill_window = 1;
+				break; }
+			case 'l': { // short description
+				wtrk.list_window = 1;
+				break; }
+			case 's' :{ // show, means listtask
+				wtrk.show_window = 1;
+				break; }
+			case 'r': { // review means show what would be billed
+				wtrk.list_window = 1;
+				wtrk.kill_window = 1;
+				break; }
+			}
+			BOOL result = EnumWindows(EnumWindowsProc, 0);
+				cout << endl  << "Done with "<<  result  << "and  " << std::dec << wtrk.win_count
+						<< " visible windows and " <<  wtrk.win_github_windows << " my_windows and "
+						<< wtrk.win_killed_windows << " killed windows and "
+						<< wtrk.win_hidden_count << " hidden windows, with " << wtrk.win_no_title
+						<< " visible windows having no title." << endl;
+				system("pause");
+				break;
+		}
+		default: {
+			cout <<  "I don't know what you mean by " << endl;
+			break;
+		}
+		}
 	}
+	cout << "That's all folks!" << endl;
 return 1;
 }
 
