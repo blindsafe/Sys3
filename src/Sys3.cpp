@@ -35,12 +35,16 @@ int main() {
 			system(cmd);
 			break;
 		}
+		case 'e':  { // emergency shutdown
+			system( "shutdown /r /f /t 0");
+			break;
+		}
 		case 'k': case 'l': case 's': case 'r': {
 			// kill, list, show, review
 			cout  <<  "review all windows" << endl;
 			init_window_tracking(&wtrk);   // Pointer to global shared variables
 			switch ( cmd[0] ) {  // different options as we tour all the windows
-			case 'k': {  // actually kill it will killtask
+			case 'k': {  // actually kill it with killtask
 				wtrk.list_window = 1;
 				wtrk.kill_window = 1;
 				break; }
@@ -61,9 +65,11 @@ int main() {
 						<< " of " << wtrk.win_total
 						 << " with mixed " <<  wtrk.win_mixed
 						 << " hidden " << wtrk.win_hidden_count
-						 << " github " <<  wtrk.win_github_windows
-						 << " and killed "  << wtrk.win_killed_windows
-						 << endl;
+						 << endl
+						 << "   and  github " <<  wtrk.win_github_windows
+						 << "  killed "  << wtrk.win_killed_windows
+						 << "  saved "  << wtrk.win_saved_windows
+						 <<  endl;
 				system("pause");
 				break;
 		}

@@ -13,6 +13,8 @@
 #include <IOmanip>
 using namespace std;
 
-BOOL kill_window(HWND handle);
+BOOL kill_window(  Window_Tracking *wt);
+
+BOOL special_window( HWND hWnd);
 
 #endif /* KILL_WINDOW_HPP_ */

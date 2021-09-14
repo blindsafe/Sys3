@@ -6,6 +6,7 @@
  */
 
 #include "Enum_Windows.hpp"
+#include "Kill_Window.hpp"
 
 struct Window_Tracking *wt;
 
@@ -27,7 +28,7 @@ void SetupKnownWIndows() {
 
 void init_window_tracking(Window_Tracking *wtptr) {
 	wt = wtptr;
-	if ( wt->active_window == 0 ) {
+	if ( wt->active_window == 0  ) {
 		// first time in
 		 SetupKnownWIndows();
 	}
@@ -43,7 +44,7 @@ void init_window_tracking(Window_Tracking *wtptr) {
 		  wt->win_mixed = 0;
 		  wt->win_hidden_count = 0;
 		  wt->win_github_windows = 0;
-		  wt->win_killed_windows = 0;
+		  wt->win_saved_windows = 0;
 
 		  wt->active_window = 0;
 		  wt->focus_window = 0;
@@ -196,9 +197,11 @@ void do_window( HWND hWnd) {
 	string filename;
    GetWindowThreadProcessId ( hWnd, &pid );
      filename = to_string(pid);
+     strcpy(wt->filename, &filename[0]);
 	if (wt->list_window) {
 		cout << std::setw(3) << std::dec << wt->win_count << "/" << std::setw(4)
 				<< std::dec << wt->win_total << "." <<wt-> marks << setw(10)
+				<< "pid= "  << pid
 				<< std::hex << hWnd << " --> " << wt->titlebuff << " ==> "
 				<< wt->namebuff << endl;
 	}
@@ -209,26 +212,9 @@ void do_window( HWND hWnd) {
 	}
 
 	if ( wt->kill_window &&	wt->could_kill_window ) {
-			char syscmd[BUF_SIZE] =  " taskkill /PID ";
-			strcat( syscmd, &filename[0]);
-			strcat(syscmd, "  /F");
-			if (wt->debug_commentary ) {
-				cout << "(**)Kill window " << wt->titlebuff << "==" << wt->namebuff << "with"
-				<< syscmd << endl;
-			}
-			if ( wt->kill_window == 2) {
-				cout <<"system( " << syscmd << " )" << endl;
-			}
-			else {
-				cout << "(**)Kill window " << wt->titlebuff << "==" << wt->namebuff << "with"
-				<< syscmd << endl;
-				system("pause");
-				system( syscmd );
-				cout << "and back";
-				system("pause");
-			}
-		wt->win_killed_windows++;
+		kill_window( wt );
 	}
+
 }
 
 BOOL CALLBACK EnumWindowsProc(HWND hWnd, long lParam) {

@@ -33,6 +33,7 @@ struct Window_Tracking {
 	int win_hidden_count = 0;          //  have neither
 	int win_github_windows = 0;     // kludge cause githum has lots of stuff
 	int win_killed_windows = 0;       // killed
+	int win_saved_windows = 0;      // not killed by special intervention
 	/*
 	 * Global variables tracking window status
 	 */
@@ -46,6 +47,7 @@ struct Window_Tracking {
 	int could_kill_window = 0;
     char titlebuff[BUF_SIZE];
 	char namebuff[BUF_SIZE];
+	char filename[BUF_SIZE];
 
 	// marks[1] =
 	char marks[7] = { ' ', ' ', ' ', ' ', ' ',' ', '\0' };
