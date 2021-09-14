@@ -26,12 +26,13 @@ struct Window_Tracking {
 	  /*
 	  * Global variables tracking  window counts
 	 */
-	int win_count = 0;
-	int win_total = 0;
-	int win_hidden_count = 0;
-	int win_no_title = 0;
-	int win_github_windows = 0;
-	int win_killed_windows = 0;
+
+	int win_total = 0;                           // everything returned by enum_proc()
+	int win_count = 0;                         // have both text and name
+;	int win_mixed = 0;                        // have one or the othr
+	int win_hidden_count = 0;          //  have neither
+	int win_github_windows = 0;     // kludge cause githum has lots of stuff
+	int win_killed_windows = 0;       // killed
 	/*
 	 * Global variables tracking window status
 	 */
@@ -43,8 +44,10 @@ struct Window_Tracking {
 	 */
 	HWND current_window;
 	int could_kill_window = 0;
-    char textbuff[BUF_SIZE];
+    char titlebuff[BUF_SIZE];
 	char namebuff[BUF_SIZE];
+
+	// marks[1] =
 	char marks[7] = { ' ', ' ', ' ', ' ', ' ',' ', '\0' };
 	int exe_title = 0;
 	int exe_name = 0;

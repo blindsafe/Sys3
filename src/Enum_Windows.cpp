@@ -37,10 +37,11 @@ void init_window_tracking(Window_Tracking *wtptr) {
 		  wt->show_window = 0;
 		  wt->kill_window = 0;
 
-		  wt->win_count = 0;
+
 		  wt->win_total = 0;
+		  wt->win_count = 0;
+		  wt->win_mixed = 0;
 		  wt->win_hidden_count = 0;
-		  wt->win_no_title = 0;
 		  wt->win_github_windows = 0;
 		  wt->win_killed_windows = 0;
 
@@ -78,7 +79,8 @@ int is_exe( char string[]) {
 	char exe_string[] = ".exe";
 	char end_string[5];
 	int rtn = 0; int copied_5 = 0;
-	if ( wt->debug_commentary ) cout << "--?is_exe(" << std::dec << len << ": " << string << " vs " << exe_string << ".";
+	// if ( wt->debug_commentary ) cout << "--?is_exe("
+	//                                                               << std::dec << len << ": " << string << " vs " << exe_string << ".";
 	if ( len >= 4 ) {
 		if ( len >= 5 ) {
 			if ( string[len - 1] == ')' ) {
@@ -92,9 +94,9 @@ int is_exe( char string[]) {
 		if ( wt->debug_commentary ) cout <<  ") with " << end_string << " vs " << exe_string  << ".";
 		if ( strcmp( end_string, exe_string) == 0 ) rtn = 1;
 	}
-	if ( wt->debug_commentary ) {
-		if (rtn ) cout << " yes"; else cout << " no"; cout << endl;
-	}
+	// if ( wt->debug_commentary ) {
+	//	if (rtn ) cout << " yes"; else cout << " no"; cout << endl;
+   //}
 	return rtn;
 }
 
@@ -109,12 +111,12 @@ void describe_window( HWND hWnd) {
 		wt->current_window = hWnd;
 		strcpy(wt->marks, "      ");
 
-		strcpy(wt->textbuff, "");wt-> exe_title = 0;
-		GetWindowText(hWnd, (LPSTR) wt->textbuff, sizeof(wt->textbuff) - 1);
-			if (strlen(wt->textbuff) < 1) {
-				strcpy(wt->textbuff, "[NO TITLE]"); has_title = 0;
+		strcpy(wt->titlebuff, "") ;wt-> exe_title = 0;
+		GetWindowText(hWnd, (LPSTR) wt->titlebuff, sizeof(wt->titlebuff) - 1);
+			if (strlen(wt->titlebuff) < 1) {
+				strcpy(wt->titlebuff, "[NO TITLE]"); has_title = 0;
 			} else {
-				wt->exe_title = is_exe(wt->textbuff);
+				wt->exe_title = is_exe(wt->titlebuff);
 			}
 		    strcpy(wt->namebuff, ""); wt->exe_name = 0;
 			GetWindowModuleFileName(hWnd, (LPSTR) wt->namebuff, sizeof(wt->namebuff) - 1);
@@ -126,7 +128,7 @@ void describe_window( HWND hWnd) {
 
 			// special kludge coding for charlie so he doesnt kill github stuff
 			 strcpy(my_window, "C:\\Users\\charlie\\github");
-			 if ( string_begin(wt->textbuff, my_window)) {
+			 if ( string_begin(wt->titlebuff, my_window)) {
 				is_github_window = 1;
 			}
 			 if ( string_begin(wt->namebuff, my_window)) {
@@ -134,13 +136,16 @@ void describe_window( HWND hWnd) {
 			 }
 			 if (is_github_window) {
 				 wt->win_github_windows++;
-				 wt->marks[5] = 'G';
-			 }
-				if (IsWindowVisible(hWnd)) {
-					if (strlen(wt->textbuff) > 0) {
-						wt->win_count++;
+				 wt->marks[5] = 'G'; }
+
+			 if ( has_title || has_name ) {
+					 wt->win_count++;
+					 kill_window = 1;
+					if ( wt->debug_commentary ) cout << "KILL SET";
+					wt->marks[3] = 'W';
+						if (IsWindowVisible(hWnd)) {
 						wt->marks[3] = 'V';
-						kill_window = 1;
+
 						if (hWnd == wt->active_window) {
 							wt->marks[0] = 'A';	kill_window = 0;
 						}
@@ -154,27 +159,35 @@ void describe_window( HWND hWnd) {
 						if (IsWindowEnabled(hWnd)) {
 							wt->marks[4] = 'E';
 						}
-					} else {
-						wt->win_no_title++;
+					}
+					if ( !has_title || !has_name ) {
+						wt->win_mixed++; wt->marks[4] = '!';
 					}
 				} else {
-					wt->win_hidden_count++;
+					wt->win_hidden_count++; wt->marks[4] = 'H';
 				}
+
 	if ( is_github_window) {
 		if ( wt->debug_commentary ) cout << "ignoring github window" << endl;
 		kill_window = 0;
 	 }
 	if ( kill_window ) {
-		if (!has_name && !has_title  ) {
+		if (!has_name && !has_title ) {
 			if ( wt->debug_commentary ) cout << "Why kill this empty  window?";
 		kill_window = 0;
 		}
 		else if (!wt->exe_title && !wt->exe_name) {
-			if ( wt->debug_commentary ) cout << "Why kill this  window that's not an exe?";
-				kill_window = 0;
+			// if ( wt->debug_commentary ) cout << "Why kill this  window that's not an exe?";
+			//	kill_window = 0;
 		}
 	}
 	wt->could_kill_window = kill_window;
+	if ( wt->debug_commentary ) cout << " three stooges " << kill_window
+			 <<  "  " <<  wt->could_kill_window << "  " << wt->kill_window
+			 << " with marks " << wt->marks
+			 << "and names = " <<  wt->namebuff
+			 << ", " << wt->titlebuff
+			 << endl;
 }
 
 void do_window( HWND hWnd) {
@@ -186,7 +199,7 @@ void do_window( HWND hWnd) {
 	if (wt->list_window) {
 		cout << std::setw(3) << std::dec << wt->win_count << "/" << std::setw(4)
 				<< std::dec << wt->win_total << "." <<wt-> marks << setw(10)
-				<< std::hex << hWnd << " --> " << wt->textbuff << " ==> "
+				<< std::hex << hWnd << " --> " << wt->titlebuff << " ==> "
 				<< wt->namebuff << endl;
 	}
 	if (wt->show_window ) {
@@ -196,17 +209,23 @@ void do_window( HWND hWnd) {
 	}
 
 	if ( wt->kill_window &&	wt->could_kill_window ) {
-			char syscmd[BUF_SIZE] =  " taskkill /PID /svc /FI \"PID eq ";
+			char syscmd[BUF_SIZE] =  " taskkill /PID ";
 			strcat( syscmd, &filename[0]);
-			strcat(syscmd, " /F");
+			strcat(syscmd, "  /F");
 			if (wt->debug_commentary ) {
-				cout << "(**)Kill window " << wt->textbuff << "==" << wt->namebuff << "with"
-				<< syscmd << endl; }
+				cout << "(**)Kill window " << wt->titlebuff << "==" << wt->namebuff << "with"
+				<< syscmd << endl;
+			}
 			if ( wt->kill_window == 2) {
 				cout <<"system( " << syscmd << " )" << endl;
 			}
 			else {
+				cout << "(**)Kill window " << wt->titlebuff << "==" << wt->namebuff << "with"
+				<< syscmd << endl;
+				system("pause");
 				system( syscmd );
+				cout << "and back";
+				system("pause");
 			}
 		wt->win_killed_windows++;
 	}
