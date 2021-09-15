@@ -6,25 +6,22 @@
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 
-
 #include "Sys3.hpp"
 
 struct Window_Tracking wtrk;
-
-
 
 int main() {
 	char cmd[BUF_SIZE];
 	int doit = 1;
 
-	while ( doit ) {
-		cout << "your wish is my command" << endl <<  "-->";
+	while (doit) {
+		cout << "your wish is my command" << endl << "-->";
 		cin >> cmd;
 		cout << "you said " << cmd << endl;
 		system("pause");
-		switch ( cmd[0] ) {
-		case 't':  { // tasklist
-			system( "tasklist");
+		switch (cmd[0]) {
+		case 't': { // tasklist
+			system("tasklist");
 			break;
 		}
 		case 'q': { // quit
@@ -35,52 +32,56 @@ int main() {
 			system(cmd);
 			break;
 		}
-		case 'e':  { // emergency shutdown
-			system( "shutdown /r /f /t 0");
+		case 'e': { // emergency shutdown
+			system("shutdown /r /f /t 0");
 			break;
 		}
-		case 'k': case 'l': case 's': case 'r': {
+		case 'k':
+		case 'l':
+		case 's':
+		case 'r': {
 			// kill, list, show, review
-			cout  <<  "review all windows" << endl;
+			cout << "review all windows" << endl;
 			init_window_tracking(&wtrk);   // Pointer to global shared variables
-			switch ( cmd[0] ) {  // different options as we tour all the windows
+			switch (cmd[0]) {  // different options as we tour all the windows
 			case 'k': {  // actually kill it with killtask
 				wtrk.list_window = 1;
 				wtrk.kill_window = 1;
-				break; }
+				break;
+			}
 			case 'l': { // short description
 				wtrk.list_window = 1;
-				break; }
-			case 's' :{ // show, means listtask
+				break;
+			}
+			case 's': { // show, means listtask
 				wtrk.show_window = 1;
-				break; }
+				break;
+			}
 			case 'r': { // review means show what would be billed
 				wtrk.list_window = 1;
 				wtrk.kill_window = 2;
-				break; }
+				break;
+			}
 			}
 			BOOL result = EnumWindows(EnumWindowsProc, 0);
-				cout << endl  << "Done with "<<  result  << " and  "
-						<< std::dec << wtrk.win_count
-						<< " of " << wtrk.win_total
-						 << " with mixed " <<  wtrk.win_mixed
-						 << " hidden " << wtrk.win_hidden_count
-						 << endl
-						 << "   and  github " <<  wtrk.win_github_windows
-						 << "  killed "  << wtrk.win_killed_windows
-						 << "  saved "  << wtrk.win_saved_windows
-						 <<  endl;
-				system("pause");
-				break;
+			cout << endl << "Done with " << result << " and  " << std::dec
+					<< wtrk.win_count << " of " << wtrk.win_total
+					<< " with mixed " << wtrk.win_mixed << " hidden "
+					<< wtrk.win_hidden_count << endl << "   and  github "
+					<< wtrk.win_github_windows << "  killed "
+					<< wtrk.win_killed_windows << "  saved "
+					<< wtrk.win_saved_windows << endl;
+			system("pause");
+			break;
 		}
 		default: {
-			cout <<  "I don't know what you mean by " << endl;
+			cout << "I don't know what you mean by " << endl;
 			break;
 		}
 		}
 	}
 	cout << "That's all folks!" << endl;
-return 1;
+	return 1;
 }
 
 #if 0 // original test bench
