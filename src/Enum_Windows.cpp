@@ -32,23 +32,21 @@ void init_window_tracking(Window_Tracking *wtptr) {
 		// first time in
 		setupKnownWIndows();
 	}
-	{
-		cout << "INITIALIZE!" << endl;
-		wt->list_window = 0;
-		wt->show_window = 0;
-		wt->kill_window = 0;
+	cout << "INITIALIZE!" << endl;
+	wt->list_window = false;
+	wt->show_window = false;
+	wt->kill_window = 0;
 
-		wt->win_total = 0;
-		wt->win_count = 0;
-		wt->win_mixed = 0;
-		wt->win_hidden_count = 0;
-		wt->win_github_windows = 0;
-		wt->win_saved_windows = 0;
+	wt->win_total = 0;
+	wt->win_count = 0;
+	wt->win_mixed = 0;
+	wt->win_hidden_count = 0;
+	wt->win_github_windows = 0;
+	wt->win_saved_windows = 0;
 
-		wt->active_window = 0;
-		wt->focus_window = 0;
-		wt->forground_window = 0;
-	}
+	wt->active_window = 0;
+	wt->focus_window = 0;
+	wt->forground_window = 0;
 }
 
 Window_Tracking* get_window_tracking() {

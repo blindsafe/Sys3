@@ -8,24 +8,31 @@
 
 #include "Sys3.hpp"
 
+#include <minwindef.h>
+#include <process.h>
+#include <winuser.h>
+
 struct Window_Tracking wtrk;
 
-int main() {
+int main(int argc, char *argv[]) {
 	char cmd[BUF_SIZE];
-	int doit = 1;
+	BOOL accepting_commands = true;
 
-	while (doit) {
+	while (accepting_commands) {
 		cout << "your wish is my command" << endl << "-->";
+		strncpy(cmd, "?", 2);   // default entry is HELP
 		cin >> cmd;
+		const char command_char = cmd[0];
 		cout << "you said " << cmd << endl;
 		system("pause");
-		switch (cmd[0]) {
+
+		switch (command_char) {
 		case 't': { // tasklist
 			system("tasklist");
 			break;
 		}
 		case 'q': { // quit
-			doit = 0;
+			accepting_commands = false;
 			break;
 		}
 		case 'c': { //cmd
@@ -41,30 +48,41 @@ int main() {
 		case 's':
 		case 'r': {
 			// kill, list, show, review
-			cout << "review all windows" << endl;
+			cout << "review all windows -->" << endl;
+			strncpy(cmd, "?", 2);
+			cin >> cmd;
+			const char subcmd_char = cmd[0];
 			init_window_tracking(&wtrk);   // Pointer to global shared variables
-			switch (cmd[0]) {  // different options as we tour all the windows
+			switch (subcmd_char) { // different options as we tour all the windows
 			case 'k': {  // actually kill it with killtask
-				wtrk.list_window = 1;
+				wtrk.list_window = true;
 				wtrk.kill_window = 1;
 				break;
 			}
 			case 'l': { // short description
-				wtrk.list_window = 1;
+				wtrk.list_window = true;
 				break;
 			}
 			case 's': { // show, means listtask
-				wtrk.show_window = 1;
+				wtrk.show_window = true;
 				break;
 			}
-			case 'r': { // review means show what would be billed
+			case 'r': { // review means show what would be killed
 				wtrk.list_window = 1;
 				wtrk.kill_window = 2;
 				break;
 			}
+			default: {
+				cout
+						<< "while reviewing windows, I don't know what you mean by '"
+						<< subcmd_char << "'" << endl;
+				break;
 			}
+			} // end of reviewing windows sub-command loop
+
+			cout << endl << "---- Starting enumeration loop! ----" << endl;
 			BOOL result = EnumWindows(EnumWindowsProc, 0);
-			cout << endl << "Done with " << result << " and  " << std::dec
+			cout << endl << "Done [result: " << result << "] and  " << std::dec
 					<< wtrk.win_count << " of " << wtrk.win_total
 					<< " with mixed " << wtrk.win_mixed << " hidden "
 					<< wtrk.win_hidden_count << endl << "   and  github "
@@ -75,48 +93,12 @@ int main() {
 			break;
 		}
 		default: {
-			cout << "I don't know what you mean by " << endl;
+			cout << "I don't know what you mean by '" << command_char << "'"
+					<< endl;
 			break;
 		}
-		}
-	}
+		} // end of command switch
+	} // end main command loop
 	cout << "That's all folks!" << endl;
-	return 1;
+	return 0;
 }
-
-#if 0 // original test bench
-int main() {
-	cout << "***List Top Level Windows***" << endl;
-
-	init_window_tracking(&wtrk);   // Pointer to global shared variables (sorry, bad!)
-	wtrk.show_window = 1;
-
-
-	// system("tasklist");	cout << "tasklist at beginning" << endl; system("pause");
-
-	BOOL result = EnumWindows(EnumWindowsProc, 0);
-	cout << endl  << "Done with "<<  result  << "and  " << std::dec << wtrk.win_count
-			<< " visible windows and " <<  wtrk.win_github_windows << " my_windows and "
-			<< wtrk.win_killed_windows << " killed windows and "
-			<< wtrk.win_hidden_count << " hidden windows, with " << wtrk.win_no_title
-			<< " visible windows having no title." << endl;
-	system("pause");
-
-
-	init_window_tracking(&wtrk);   // Pointer to global shared variables (sorry, bad!)
-	// try again to see whats different
-	wtrk.show_window = 1; wtrk.kill_window = 1;
-    result = EnumWindows(EnumWindowsProc, 0);
-	cout << endl  << "Done with "<<  result  << "and  " << std::dec << wtrk.win_count
-			<< " visible windows and " <<  wtrk.win_github_windows << " my_windows and "
-			<< wtrk.win_killed_windows << " killed windows and "
-			<< wtrk.win_hidden_count << " hidden windows, with " << wtrk.win_no_title
-			<< " visible windows having no title." << endl;
-	system("pause");
-
-	// system("tasklist") ; cout << "tasklist at end of 2nd go" << endl; 	system("pause");
-	cout << "***" << endl;
-
-	return result ? 1 : 0;
-}
-#endif
