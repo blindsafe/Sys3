@@ -67,8 +67,8 @@ int main() {
 			cout << endl << "Done with " << result << " and  " << std::dec
 					<< wtrk.win_count << " of " << wtrk.win_total
 					<< " with mixed " << wtrk.win_mixed << " hidden "
-					<< wtrk.win_hidden_count << endl << "   and  github "
-					<< wtrk.win_github_windows << "  killed "
+					<< wtrk.win_hidden_count << endl << "   and  blindsafe "
+					<< wtrk.win_blindsafe_windows << "  killed "
 					<< wtrk.win_killed_windows << "  saved "
 					<< wtrk.win_saved_windows << endl;
 			system("pause");
@@ -96,7 +96,7 @@ int main() {
 
 	BOOL result = EnumWindows(EnumWindowsProc, 0);
 	cout << endl  << "Done with "<<  result  << "and  " << std::dec << wtrk.win_count
-			<< " visible windows and " <<  wtrk.win_github_windows << " my_windows and "
+			<< " visible windows and " <<  wtrk.win_blindsafe_windows << " my_windows and "
 			<< wtrk.win_killed_windows << " killed windows and "
 			<< wtrk.win_hidden_count << " hidden windows, with " << wtrk.win_no_title
 			<< " visible windows having no title." << endl;
@@ -108,7 +108,7 @@ int main() {
 	wtrk.show_window = 1; wtrk.kill_window = 1;
     result = EnumWindows(EnumWindowsProc, 0);
 	cout << endl  << "Done with "<<  result  << "and  " << std::dec << wtrk.win_count
-			<< " visible windows and " <<  wtrk.win_github_windows << " my_windows and "
+			<< " visible windows and " <<  wtrk.win_blindsafe_windows << " my_windows and "
 			<< wtrk.win_killed_windows << " killed windows and "
 			<< wtrk.win_hidden_count << " hidden windows, with " << wtrk.win_no_title
 			<< " visible windows having no title." << endl;

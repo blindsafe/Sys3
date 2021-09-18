@@ -32,7 +32,7 @@ struct Window_Tracking {
 	int win_count = 0;                    // have both text and name
 	int win_mixed = 0;                    // have one or the other
 	int win_hidden_count = 0;             //  have neither
-	int win_github_windows = 0;         // kludge cause GitHub has lots of stuff
+	int win_blindsafe_windows = 0;         // kludge cause blindsafe has lots of stuff
 	int win_killed_windows = 0;           // killed
 	int win_saved_windows = 0;            // not killed by special intervention
 
@@ -55,7 +55,11 @@ struct Window_Tracking {
 	// marks[1] =
 	char marks[7] = { ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
 	int exe_title = 0;
+	int has_title = 0;
 	int exe_name = 0;
+	int has_name = 0;
+	int is_special; // 0 = no 1 = yes, save, 2 = definitely kill, 3 = yes, save, is "default"
+	int is_blindsafe_window;
 };
 
 void setupKnownWindows();

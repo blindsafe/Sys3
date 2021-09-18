@@ -33,7 +33,6 @@ void init_window_tracking(Window_Tracking *wtptr) {
 		setupKnownWIndows();
 	}
 	{
-		cout << "INITIALIZE!" << endl;
 		wt->list_window = 0;
 		wt->show_window = 0;
 		wt->kill_window = 0;
@@ -42,7 +41,8 @@ void init_window_tracking(Window_Tracking *wtptr) {
 		wt->win_count = 0;
 		wt->win_mixed = 0;
 		wt->win_hidden_count = 0;
-		wt->win_github_windows = 0;
+		wt->win_killed_windows = 0;
+		wt->win_blindsafe_windows = 0;
 		wt->win_saved_windows = 0;
 
 		wt->active_window = 0;
@@ -106,10 +106,10 @@ int is_exe(char string[]) {
 void describe_window(HWND hWnd) {
 
 	char my_window[BUF_SIZE];
-	int is_github_window = 0;
 	int kill_window = 0; // various reasons to not kill  window, tested below
-	int has_title = 1;
-	int has_name = 1;
+	wt->has_title = 1;
+	wt->has_name = 1;
+	wt->is_blindsafe_window = 0;
 
 	wt->current_window = hWnd;
 	strcpy(wt->marks, "      ");
@@ -119,7 +119,7 @@ void describe_window(HWND hWnd) {
 	GetWindowText(hWnd, (LPSTR) wt->titlebuff, sizeof(wt->titlebuff) - 1);
 	if (strlen(wt->titlebuff) < 1) {
 		strcpy(wt->titlebuff, "[NO TITLE]");
-		has_title = 0;
+		wt->has_title = 0;
 	} else {
 		wt->exe_title = is_exe(wt->titlebuff);
 	}
@@ -129,29 +129,34 @@ void describe_window(HWND hWnd) {
 			sizeof(wt->namebuff) - 1);
 	if (strlen(wt->namebuff) < 1) {
 		strcpy(wt->namebuff, "[NO MODULE]");
-		has_name = 0;
+		wt->has_name = 0;
 	} else {
 		wt->exe_name = is_exe(wt->namebuff);
 	}
 
-	// special kludge coding for charlie so he doesnt kill github stuff
+	// special kludge coding for charlie so he doesnt kill blindsafe stuff
 	strcpy(my_window, "C:\\Users\\charlie\\github");
 	if (string_begin(wt->titlebuff, my_window)) {
-		is_github_window = 1;
+		wt->is_blindsafe_window = 1;
 	}
-	if (string_begin(wt->namebuff, my_window)) {
-		is_github_window = 1;
+	else if (string_begin(wt->namebuff, my_window)) {
+		wt->is_blindsafe_window = 1;
 	}
-	if (is_github_window) {
-		wt->win_github_windows++;
+	else if ( string_contains(wt->namebuff, "blindsafe")) {
+		wt->is_blindsafe_window = 1;
+	}
+	else if ( string_contains(wt->namebuff, "blindsafe")) {
+		wt->is_blindsafe_window = 1;
+	}
+	if (wt->is_blindsafe_window) {
+		wt->win_blindsafe_windows++;
 		wt->marks[5] = 'G';
 	}
 
-	if (has_title || has_name) {
+	if (wt->has_title || wt->has_name) {
 		wt->win_count++;
 		kill_window = 1;
-		if (wt->debug_commentary)
-			cout << "KILL SET";
+
 		wt->marks[3] = 'W';
 		if (IsWindowVisible(hWnd)) {
 			wt->marks[3] = 'V';
@@ -173,7 +178,7 @@ void describe_window(HWND hWnd) {
 				wt->marks[4] = 'E';
 			}
 		}
-		if (!has_title || !has_name) {
+		if (!wt->has_title || !wt->has_name) {
 			wt->win_mixed++;
 			wt->marks[4] = '!';
 		}
@@ -182,24 +187,19 @@ void describe_window(HWND hWnd) {
 		wt->marks[4] = 'H';
 	}
 
-	if (is_github_window) {
-		if (wt->debug_commentary)
-			cout << "ignoring github window" << endl;
+	if (wt->is_blindsafe_window) {
 		kill_window = 0;
 	}
 	if (kill_window) {
-		if (!has_name && !has_title) {
-			if (wt->debug_commentary)
+		if (!wt->has_name && !wt->has_title) {
 				cout << "Why kill this empty  window?";
 			kill_window = 0;
-		} else if (!wt->exe_title && !wt->exe_name) {
-			// if ( wt->debug_commentary ) cout << "Why kill this  window that's not an exe?";
-			//	kill_window = 0;
 		}
 	}
 	wt->could_kill_window = kill_window;
+	wt->is_special = special_window( wt);
 	if (wt->debug_commentary)
-		cout << " three stooges " << kill_window << "  "
+		cout << " describe out with  " << kill_window << "  "
 				<< wt->could_kill_window << "  " << wt->kill_window
 				<< " with marks " << wt->marks << "and names = " << wt->namebuff
 				<< ", " << wt->titlebuff << endl;
@@ -213,10 +213,25 @@ void do_window(HWND hWnd) {
 	filename = to_string(pid);
 	strcpy(wt->filename, &filename[0]);
 	if (wt->list_window) {
+#if 0 // debugging fiddle to go away eventually
+		if ( wt->marks[3] == ' V' ) {
+			cout << "VISIBLE "	<< "pid= " << pid << std::hex << hWnd << " --> "
+					<< wt->titlebuff << " ==> " << wt->namebuff << endl;
+		}
+		else if ((wt->is_special == 1) || (wt->is_special ==3 ) ||
+				( (!wt->has_name ) && ( !wt->has_title) )) { ; }
+		else if ( wt->is_blindsafe_window) {
+			cout << "blindsafe "	<< "pid= " << pid << std::hex << hWnd << " --> "
+					<< wt->titlebuff << " ==> " << wt->namebuff << endl;
+		}
+		else
+#endif
+		{
 		cout << std::setw(3) << std::dec << wt->win_count << "/" << std::setw(4)
 				<< std::dec << wt->win_total << "." << wt->marks << setw(10)
 				<< "pid= " << pid << std::hex << hWnd << " --> "
 				<< wt->titlebuff << " ==> " << wt->namebuff << endl;
+		}
 	}
 	if (wt->show_window) {
 		char syscmd[BUF_SIZE] = " tasklist /svc /FI \"PID eq ";
