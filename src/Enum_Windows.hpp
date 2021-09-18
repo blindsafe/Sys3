@@ -13,25 +13,24 @@
 #include <IOmanip>
 using namespace std;
 
-#define BUF_SIZE 256  // universal size for names, commands
+#define BUF_SIZE 256  // universal buffer character size for names and commands
 
 struct Window_Tracking {
 	/*
 	 * Global variables directing actions
 	 */
-	int list_window = 0;
-	int show_window = 0;
-	int kill_window = 0;   //  1= yes, 2 = just say what you would do
+	BOOL list_window = 0;
+	BOOL show_window = 0;
+	int kill_window = 0; //  0 = initial state, 1 = yes, 2 = just say what you would do
 	int debug_commentary = 0;
 
 	/*
 	 * Global variables tracking  window counts
 	 */
-
 	int win_total = 0;                    // everything returned by enum_proc()
 	int win_count = 0;                    // have both text and name
 	int win_mixed = 0;                    // have one or the other
-	int win_hidden_count = 0;             //  have neither
+	int win_hidden_count = 0;  // there but not seen
 	int win_blindsafe_windows = 0;         // kludge cause blindsafe has lots of stuff
 	int win_killed_windows = 0;           // killed
 	int win_saved_windows = 0;            // not killed by special intervention
