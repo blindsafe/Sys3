@@ -43,8 +43,8 @@ void init_window_tracking(Window_Tracking *wtptr) {
 	wt->win_hidden_count = 0;
 	wt->win_blindsafe_windows = 0;
 	wt->win_saved_windows = 0;
+	wt->win_killed_windows = 0;
 
-	wt->active_window = 0;
 	wt->focus_window = 0;
 	wt->forground_window = 0;
 }
@@ -103,8 +103,8 @@ int is_exe(char string[]) {
 
 void describe_window(HWND hWnd) {
 
-	char my_window[BUF_SIZE];
-	int kill_window = 0; // various reasons to not kill  window, tested below
+
+	int should_kill_window = 0; // various reasons to not kill  window, tested below
 	wt->has_title = 1;
 	wt->has_name = 1;
 	wt->is_blindsafe_window = 0;
@@ -132,44 +132,45 @@ void describe_window(HWND hWnd) {
 		wt->exe_name = is_exe(wt->namebuff);
 	}
 
-	// special kludge coding for charlie so he doesnt kill blindsafe stuff
-	strcpy(my_window, "C:\\Users\\charlie\\github");
-	if (string_begin(wt->titlebuff, my_window)) {
-		wt->is_blindsafe_window = 1;
-	}
-	else if (string_begin(wt->namebuff, my_window)) {
+
+	 if ( string_contains(wt->titlebuff, "blindsafe")) {
 		wt->is_blindsafe_window = 1;
 	}
 	else if ( string_contains(wt->namebuff, "blindsafe")) {
 		wt->is_blindsafe_window = 1;
 	}
-	else if ( string_contains(wt->namebuff, "blindsafe")) {
+	else if ( string_contains(wt->titlebuff, "github")) {
 		wt->is_blindsafe_window = 1;
 	}
+	else if ( string_contains(wt->namebuff, "github")) {
+		wt->is_blindsafe_window = 1;
+	}
+
 	if (wt->is_blindsafe_window) {
+		cout << "blindsafe " << wt->titlebuff << "and" << wt->namebuff << endl;
 		wt->win_blindsafe_windows++;
 		wt->marks[5] = 'G';
 	}
 
 	if (wt->has_title || wt->has_name) {
 		wt->win_count++;
-		kill_window = 1;
-
+		wt->is_special = special_window( wt);
+		if ( (wt->is_special == 0 )  || (wt->is_special == 2 ) ) should_kill_window = 1;
 		wt->marks[3] = 'W';
 		if (IsWindowVisible(hWnd)) {
 			wt->marks[3] = 'V';
 
 			if (hWnd == wt->active_window) {
 				wt->marks[0] = 'A';
-				kill_window = 0;
+				should_kill_window = 0;
 			}
 			if (hWnd == wt->focus_window) {
 				wt->marks[1] = 'F';
-				kill_window = 0;
+				should_kill_window = 0;
 			}
 			if (hWnd == wt->forground_window) {
 				wt->marks[2] = '*';
-				kill_window = 0;
+				should_kill_window = 0;
 			}
 
 			if (IsWindowEnabled(hWnd)) {
@@ -186,21 +187,23 @@ void describe_window(HWND hWnd) {
 	}
 
 	if (wt->is_blindsafe_window) {
-		kill_window = 0;
+		should_kill_window = 0;
 	}
-	if (kill_window) {
+	if (should_kill_window) {
 		if (!wt->has_name && !wt->has_title) {
 				cout << "Why kill this empty  window?";
-			kill_window = 0;
+			should_kill_window = 0;
 		}
 	}
-	wt->could_kill_window = kill_window;
-	wt->is_special = special_window( wt);
-	if (wt->debug_commentary)
+
+	wt->could_kill_window =should_kill_window;
+
+	if  (wt->debug_commentary) {
 		cout << " describe out with  " << kill_window << "  "
 				<< wt->could_kill_window << "  " << wt->kill_window
 				<< " with marks " << wt->marks << "and names = " << wt->namebuff
 				<< ", " << wt->titlebuff << endl;
+	}
 }
 
 void do_window(HWND hWnd) {
@@ -211,19 +214,6 @@ void do_window(HWND hWnd) {
 	filename = to_string(pid);
 	strcpy(wt->filename, &filename[0]);
 	if (wt->list_window) {
-#if 0 // debugging fiddle to go away eventually
-		if ( wt->marks[3] == ' V' ) {
-			cout << "VISIBLE "	<< "pid= " << pid << std::hex << hWnd << " --> "
-					<< wt->titlebuff << " ==> " << wt->namebuff << endl;
-		}
-		else if ((wt->is_special == 1) || (wt->is_special ==3 ) ||
-				( (!wt->has_name ) && ( !wt->has_title) )) { ; }
-		else if ( wt->is_blindsafe_window) {
-			cout << "blindsafe "	<< "pid= " << pid << std::hex << hWnd << " --> "
-					<< wt->titlebuff << " ==> " << wt->namebuff << endl;
-		}
-		else
-#endif
 		{
 		cout << std::setw(3) << std::dec << wt->win_count << "/" << std::setw(4)
 				<< std::dec << wt->win_total << "." << wt->marks << setw(10)
@@ -237,10 +227,10 @@ void do_window(HWND hWnd) {
 		system(syscmd);
 	}
 
+	// cout  << "kills " << wt->kill_window << " " <<  wt->could_kill_window << endl;
 	if (wt->kill_window && wt->could_kill_window) {
 		kill_window(wt);
 	}
-
 }
 
 BOOL CALLBACK EnumWindowsProc(HWND hWnd, long lParam) {

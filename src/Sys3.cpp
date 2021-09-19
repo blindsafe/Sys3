@@ -48,14 +48,11 @@ int main(int argc, char *argv[]) {
 		case 's':
 		case 'r': {
 			// kill, list, show, review
-			cout << "review all windows -->" << endl;
-			strncpy(cmd, "?", 2);
-			cin >> cmd;
-			const char subcmd_char = cmd[0];
+		const char subcmd_char = cmd[0];
 			init_window_tracking(&wtrk);   // Pointer to global shared variables
 			switch (subcmd_char) { // different options as we tour all the windows
 			case 'k': {  // actually kill it with killtask
-				wtrk.list_window = true;
+			    wtrk.list_window = true;
 				wtrk.kill_window = 1;
 				break;
 			}
@@ -103,4 +100,3 @@ int main(int argc, char *argv[]) {
 	return 1;
 }
 
-l

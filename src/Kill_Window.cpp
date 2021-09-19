@@ -29,8 +29,9 @@ BOOL special_window(Window_Tracking *wt) {
 	// but others definitely want to be!
 	int is_special = 0;  // 1=yes, dont kill, 2=do kill, 0 = dont know
 
-	 if ( string_contains(wt->titlebuff, "Default" ) ) is_special = 3;  // special recognition for this common case
-	 else if ( string_contains(wt->namebuff, "Default" ) ) is_special = 3;  // special recognition for this common case
+	 if ( wt->is_blindsafe_window) is_special = 1;
+	else  if ( string_contains(wt->titlebuff, "Default" ) ) is_special = 3;  // special recognition for this common case
+	else if ( string_contains(wt->namebuff, "Default" ) ) is_special = 3;  // special recognition for this common case
 	// all these should be left alone
 	 else if ( string_contains(wt->titlebuff, "Window" ) ) is_special = 1;
 	else if ( string_contains(wt->titlebuff, "Battery Meter" ) ) is_special = 1;
@@ -70,13 +71,13 @@ BOOL special_window(Window_Tracking *wt) {
 	else if ( string_contains(wt->titlebuff,  "FSIScanner" ) ) is_special = 1;
 	else if ( string_contains(wt->titlebuff,  "FSCAM" ) ) is_special = 1;
 	else if ( string_contains(wt->titlebuff,  "JAWS" ) ) is_special = 1;
-
+    else if ( string_contains(wt->titlebuff, "File Explorer" ) ) is_special = 1;
 
 	if ( ! is_special ) {	// these definitely want to be killed
 	if ( string_contains(wt->titlebuff, "Notepad" ) ) is_special = 2;
 	else if ( string_contains(wt->titlebuff, "Word" ) ) is_special = 2;
 	else if ( (wt->titlebuff[0] == 'W' ) && (wt->titlebuff[1] == '\0')) is_special = 2;
-	else if ( string_contains(wt->titlebuff, "Explorer" ) ) is_special = 2;
+    else if ( string_contains(wt->titlebuff, "Explorer" ) ) is_special = 2;
 	else if ( string_contains(wt->titlebuff, "Outlook" ) ) is_special = 2;
 	else if ( string_contains(wt->titlebuff, "Bing" ) ) is_special = 2;
 }
@@ -96,27 +97,20 @@ BOOL kill_window(Window_Tracking *wt) {
 	strcat(syscmd, "  /F");
 
 	if ( wt->debug_commentary ) {
-				cout << "(?)Kill window " << wt->titlebuff << "==" << wt->namebuff << "with"
-				<< syscmd << endl;
+				cout << "(?)Kill window, special= " << wt->is_special << "for "
+						<< wt->namebuff  << "with" << syscmd << endl;
 			}
 
 	if ( (wt->is_special  == 1) || (wt->is_special == 3)) {
 		wt->win_saved_windows++;
 	}
 	else {  // (special == 2) | | (special == 0)
-		if ( wt->is_special == 2 ) {
-			cout <<  "is_special == 2";
-		}
-		if ( wt->kill_window == 2) {
-				cout <<"system( " << syscmd << " )" << endl;
-			}
-		else {
+		 {
 				cout << "(**)Kill window " << wt->titlebuff << "==" << wt->namebuff << "with"
 				<< syscmd << endl;
-				system("pause");
+				// system("pause");
 				system( syscmd );
-				cout << "and back";
-				system("pause");
+				// cout << "and back"; system("pause");
 			wt->win_killed_windows++;
 			killed = 1;
 		}
