@@ -8,6 +8,7 @@
 #ifndef ENUM_WINDOWS_HPP_
 #define ENUM_WINDOWS_HPP_
 
+#include <string.h>
 #include <windows.h>
 #include <iostream>
 #include <IOmanip>
@@ -15,14 +16,21 @@ using namespace std;
 
 #define BUF_SIZE 256  // universal buffer character size for names and commands
 
+// See https://www.geeksforgeeks.org/enumeration-enum-c/
+// 0 = initial state, 1 = yes, 2 = just say what you would do
+// 0 = no, 1 = yes, save, 2 = definitely kill, 3 = yes, save, is "default"
+enum Window_Type {
+	W_NO, W_YES, W_KILL, W_YES_DEFAULT
+};
+
 struct Window_Tracking {
 	/*
 	 * Global variables directing actions
 	 */
-	BOOL list_window = 0;
-	BOOL show_window = 0;
+	BOOL list_window = FALSE;
+	BOOL show_window = FALSE;
 	int kill_window = 0; //  0 = initial state, 1 = yes, 2 = just say what you would do
-	int debug_commentary = 0;
+	BOOL debug_commentary = FALSE;
 
 	/*
 	 * Global variables tracking  window counts
@@ -30,8 +38,8 @@ struct Window_Tracking {
 	int win_total = 0;                    // everything returned by enum_proc()
 	int win_count = 0;                    // have both text and name
 	int win_mixed = 0;                    // have one or the other
-	int win_hidden_count = 0;  // there but not seen
-	int win_blindsafe_windows = 0;         // kludge cause blindsafe has lots of stuff
+	int win_hidden_count = 0;             // there but not seen
+	int win_blindsafe_windows = 0;   // kludge cause blindsafe has lots of stuff
 	int win_killed_windows = 0;           // killed
 	int win_saved_windows = 0;            // not killed by special intervention
 
@@ -43,7 +51,7 @@ struct Window_Tracking {
 	HWND forground_window = 0;
 
 	/*
-	 * stuff about the current window
+	 * Stuff about the current window
 	 */
 	HWND current_window;
 	int could_kill_window = 0;
@@ -56,17 +64,17 @@ struct Window_Tracking {
 	int exe_title = 0;
 	int has_title = 0;
 	int exe_name = 0;
-	int has_name = 0;
-	int is_special; // 0 = no 1 = yes, save, 2 = definitely kill, 3 = yes, save, is "default"
-	int is_blindsafe_window;
+	BOOL has_name = FALSE;
+	Window_Type is_special = W_NO;
+	BOOL is_blindsafe_window = FALSE;
 };
+
+Window_Tracking* get_window_tracking();
 
 void setupKnownWindows();
 
 void init_window_tracking(Window_Tracking *wtptr);
 
-Window_Tracking* get_window_tracking();
-
-BOOL CALLBACK EnumWindowsProc(HWND hWnd, long lParam);
+BOOL CALLBACK EnumWindowsProc(const HWND hWnd, const long lParam);
 
 #endif /* ENUM_WINDOWS_HPP_ */

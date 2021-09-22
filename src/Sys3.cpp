@@ -3,7 +3,7 @@
 // Author      : Charles Yarbrough
 // Version     : 0.1.0
 // Copyright   : (c) 2021
-// Description : Hello World in C++, Ansi-style
+// Description : blindSafe Main Program
 //============================================================================
 
 #include "Sys3.hpp"
@@ -16,7 +16,7 @@ struct Window_Tracking wtrk;
 
 int main(int argc, char *argv[]) {
 	char cmd[BUF_SIZE];
-	BOOL accepting_commands = true;
+	bool accepting_commands = true;
 
 	while (accepting_commands) {
 		cout << "your wish is my command" << endl << "-->";
@@ -48,11 +48,11 @@ int main(int argc, char *argv[]) {
 		case 's':
 		case 'r': {
 			// kill, list, show, review
-		const char subcmd_char = cmd[0];
+			const char subcmd_char = cmd[0];
 			init_window_tracking(&wtrk);   // Pointer to global shared variables
 			switch (subcmd_char) { // different options as we tour all the windows
 			case 'k': {  // actually kill it with killtask
-			    wtrk.list_window = true;
+				wtrk.list_window = true;
 				wtrk.kill_window = 1;
 				break;
 			}
@@ -97,6 +97,6 @@ int main(int argc, char *argv[]) {
 		} // end of command switch
 	} // end main command loop
 	cout << "That's all folks!" << endl;
-	return 1;
+	return (1);
 }
 
