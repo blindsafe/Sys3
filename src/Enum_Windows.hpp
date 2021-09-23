@@ -19,9 +19,9 @@ using namespace std;
 // See https://www.geeksforgeeks.org/enumeration-enum-c/
 // 0 = initial state, 1 = yes, 2 = just say what you would do
 // 0 = no, 1 = yes, save, 2 = definitely kill, 3 = yes, save, is "default"
-enum Window_Type {
-	W_NO, W_YES, W_KILL, W_YES_DEFAULT
-};
+//enum Window_Type {
+//	W_NO, W_YES, W_KILL, W_YES_DEFAULT
+//};
 
 struct Window_Tracking {
 	/*
@@ -65,7 +65,7 @@ struct Window_Tracking {
 	int has_title = 0;
 	int exe_name = 0;
 	BOOL has_name = FALSE;
-	Window_Type is_special = W_NO;
+	int is_special = 0;
 	BOOL is_blindsafe_window = FALSE;
 };
 

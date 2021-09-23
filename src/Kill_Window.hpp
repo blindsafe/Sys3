@@ -13,11 +13,12 @@
 #include <IOmanip>
 using namespace std;
 
+#include "Enum_Windows.hpp"
 
-BOOL string_contains( char *target_string, const char *test_string);
+BOOL string_contains(const char *target_string, const char *test_string);
 
-BOOL kill_window(  Window_Tracking *wt);
+BOOL kill_window(Window_Tracking *wt);
 
-int special_window( Window_Tracking *wt);
+int special_window(const Window_Tracking *wt);
 
 #endif /* KILL_WINDOW_HPP_ */

@@ -5,7 +5,6 @@
  *      Author: Charles Yarbrough
  */
 
-#include "Enum_Windows.hpp"
 #include "Kill_Window.hpp"
 
 struct Window_Tracking *wt;
@@ -103,7 +102,6 @@ int is_exe(char string[]) {
 
 void describe_window(HWND hWnd) {
 
-
 	int should_kill_window = 0; // various reasons to not kill  window, tested below
 	wt->has_title = 1;
 	wt->has_name = 1;
@@ -132,17 +130,13 @@ void describe_window(HWND hWnd) {
 		wt->exe_name = is_exe(wt->namebuff);
 	}
 
-
-	 if ( string_contains(wt->titlebuff, "blindsafe")) {
+	if (string_contains(wt->titlebuff, "blindsafe")) {
 		wt->is_blindsafe_window = 1;
-	}
-	else if ( string_contains(wt->namebuff, "blindsafe")) {
+	} else if (string_contains(wt->namebuff, "blindsafe")) {
 		wt->is_blindsafe_window = 1;
-	}
-	else if ( string_contains(wt->titlebuff, "github")) {
+	} else if (string_contains(wt->titlebuff, "github")) {
 		wt->is_blindsafe_window = 1;
-	}
-	else if ( string_contains(wt->namebuff, "github")) {
+	} else if (string_contains(wt->namebuff, "github")) {
 		wt->is_blindsafe_window = 1;
 	}
 
@@ -154,8 +148,9 @@ void describe_window(HWND hWnd) {
 
 	if (wt->has_title || wt->has_name) {
 		wt->win_count++;
-		wt->is_special = special_window( wt);
-		if ( (wt->is_special == 0 )  || (wt->is_special == 2 ) ) should_kill_window = 1;
+		wt->is_special = special_window(wt);
+		if ((wt->is_special == 0) || (wt->is_special == 2))
+			should_kill_window = 1;
 		wt->marks[3] = 'W';
 		if (IsWindowVisible(hWnd)) {
 			wt->marks[3] = 'V';
@@ -191,34 +186,34 @@ void describe_window(HWND hWnd) {
 	}
 	if (should_kill_window) {
 		if (!wt->has_name && !wt->has_title) {
-				cout << "Why kill this empty  window?";
+			cout << "Why kill this empty  window?";
 			should_kill_window = 0;
 		}
 	}
 
-	wt->could_kill_window =should_kill_window;
+	wt->could_kill_window = should_kill_window;
 
-	if  (wt->debug_commentary) {
-		cout << " describe out with  "
-				<< wt->could_kill_window << "  " << wt->kill_window
-				<< " with marks " << wt->marks << "and names = " << wt->namebuff
-				<< ", " << wt->titlebuff << endl;
+	if (wt->debug_commentary) {
+		cout << " describe out with  " << wt->could_kill_window << "  "
+				<< wt->kill_window << " with marks " << wt->marks
+				<< "and names = " << wt->namebuff << ", " << wt->titlebuff
+				<< endl;
 	}
 }
 
 void do_window(HWND hWnd) {
 // everything below is about the HWND we have in hand
 	long unsigned int pid = 0;
-	string filename;
 	GetWindowThreadProcessId(hWnd, &pid);
-	filename = to_string(pid);
+	string filename = to_string(pid);
 	strcpy(wt->filename, &filename[0]);
 	if (wt->list_window) {
 		{
-		cout << std::setw(3) << std::dec << wt->win_count << "/" << std::setw(4)
-				<< std::dec << wt->win_total << "." << wt->marks << setw(10)
-				<< "pid= " << pid << std::hex << hWnd << " --> "
-				<< wt->titlebuff << " ==> " << wt->namebuff << endl;
+			cout << std::setw(3) << std::dec << wt->win_count << "/"
+					<< std::setw(4) << std::dec << wt->win_total << "."
+					<< wt->marks << setw(10) << "pid= " << pid << std::hex
+					<< hWnd << " --> " << wt->titlebuff << " ==> "
+					<< wt->namebuff << endl;
 		}
 	}
 	if (wt->show_window) {
@@ -227,16 +222,15 @@ void do_window(HWND hWnd) {
 		system(syscmd);
 	}
 
-	if ( (wt->is_special  == 1) || (wt->is_special == 3)) {
-			wt->win_saved_windows++;
-		}
-		else {
-			// (special == 2) | | (special == 0)
+	if ((wt->is_special == 1) || (wt->is_special == 3)) {
+		wt->win_saved_windows++;
+	} else {
+		// (special == 2) | | (special == 0)
 
-	if (wt->kill_window && wt->could_kill_window) {
-		kill_window(wt);
-	}
+		if (wt->kill_window && wt->could_kill_window) {
+			kill_window(wt);
 		}
+	}
 }
 
 BOOL CALLBACK EnumWindowsProc(HWND hWnd, long lParam) {

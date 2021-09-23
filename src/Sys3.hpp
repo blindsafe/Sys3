@@ -11,6 +11,9 @@
 #include <windows.h>
 #include <iostream>
 #include <IOmanip>
+#include <minwindef.h>
+#include <process.h>
+#include <winuser.h>
 
 using namespace std;
 
