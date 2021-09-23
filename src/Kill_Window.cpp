@@ -71,7 +71,9 @@ BOOL special_window(Window_Tracking *wt) {
 	else if ( string_contains(wt->titlebuff,  "FSIScanner" ) ) is_special = 1;
 	else if ( string_contains(wt->titlebuff,  "FSCAM" ) ) is_special = 1;
 	else if ( string_contains(wt->titlebuff,  "JAWS" ) ) is_special = 1;
-    else if ( string_contains(wt->titlebuff, "File Explorer" ) ) is_special = 1;
+	 else if ( string_contains(wt->titlebuff, "File Explorer" ) ) is_special = 1;
+	 else if ( string_contains(wt->titlebuff, "Alexa" ) ) is_special = 1;
+
 
 	if ( ! is_special ) {	// these definitely want to be killed
 	if ( string_contains(wt->titlebuff, "Notepad" ) ) is_special = 2;
@@ -81,7 +83,7 @@ BOOL special_window(Window_Tracking *wt) {
 	else if ( string_contains(wt->titlebuff, "Outlook" ) ) is_special = 2;
 	else if ( string_contains(wt->titlebuff, "Bing" ) ) is_special = 2;
 }
-	if (  wt->debug_commentary &&  is_special) {
+	if ( /*  wt->debug_commentary && */  is_special) {
 		cout  << "special = " << is_special  << " for " << wt->filename
 		   << " =  " << wt->titlebuff << endl;
 		//  system( "pause");
@@ -96,15 +98,13 @@ BOOL kill_window(Window_Tracking *wt) {
 	strcat( syscmd, wt->filename);
 	strcat(syscmd, "  /F");
 
-	if ( wt->debug_commentary ) {
+	// if ( wt->debug_commentary )
+	{
 				cout << "(?)Kill window, special= " << wt->is_special << "for "
 						<< wt->namebuff  << "with" << syscmd << endl;
 			}
 
-	if ( (wt->is_special  == 1) || (wt->is_special == 3)) {
-		wt->win_saved_windows++;
-	}
-	else {  // (special == 2) | | (special == 0)
+
 		 {
 				cout << "(**)Kill window " << wt->titlebuff << "==" << wt->namebuff << "with"
 				<< syscmd << endl;
@@ -114,6 +114,5 @@ BOOL kill_window(Window_Tracking *wt) {
 			wt->win_killed_windows++;
 			killed = 1;
 		}
-	}
 	return killed;
 }

@@ -147,7 +147,7 @@ void describe_window(HWND hWnd) {
 	}
 
 	if (wt->is_blindsafe_window) {
-		cout << "blindsafe " << wt->titlebuff << "and" << wt->namebuff << endl;
+		// cout << "blindsafe " << wt->titlebuff << "and" << wt->namebuff << endl;
 		wt->win_blindsafe_windows++;
 		wt->marks[5] = 'G';
 	}
@@ -199,7 +199,7 @@ void describe_window(HWND hWnd) {
 	wt->could_kill_window =should_kill_window;
 
 	if  (wt->debug_commentary) {
-		cout << " describe out with  " << kill_window << "  "
+		cout << " describe out with  "
 				<< wt->could_kill_window << "  " << wt->kill_window
 				<< " with marks " << wt->marks << "and names = " << wt->namebuff
 				<< ", " << wt->titlebuff << endl;
@@ -227,10 +227,16 @@ void do_window(HWND hWnd) {
 		system(syscmd);
 	}
 
-	// cout  << "kills " << wt->kill_window << " " <<  wt->could_kill_window << endl;
+	if ( (wt->is_special  == 1) || (wt->is_special == 3)) {
+			wt->win_saved_windows++;
+		}
+		else {
+			// (special == 2) | | (special == 0)
+
 	if (wt->kill_window && wt->could_kill_window) {
 		kill_window(wt);
 	}
+		}
 }
 
 BOOL CALLBACK EnumWindowsProc(HWND hWnd, long lParam) {
