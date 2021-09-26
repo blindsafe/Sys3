@@ -29,6 +29,7 @@ int special_window(const Window_Tracking *wt) {
 	// but others definitely want to be!
 	int is_special = 0;  // 1=yes, don't kill, 2=do kill, 0 = don't know
 
+#if 0 // interesting, but shouldnt be necessary
 	if (wt->is_blindsafe_window)
 		is_special = 1;
 	else if (string_contains(wt->titlebuff, "Default"))
@@ -115,6 +116,10 @@ int special_window(const Window_Tracking *wt) {
 		is_special = 1;
 
 	if (!is_special) {	// these definitely want to be killed
+#endif
+
+		cout << "test  " <<  wt->titlebuff << " -- " << wt->namebuff << endl;
+
 		if (string_contains(wt->titlebuff, "Notepad"))
 			is_special = 2;
 		else if (string_contains(wt->titlebuff, "Word"))
@@ -127,7 +132,11 @@ int special_window(const Window_Tracking *wt) {
 			is_special = 2;
 		else if (string_contains(wt->titlebuff, "Bing"))
 			is_special = 2;
-	}
+		else if (string_contains(wt->titlebuff, "Edge"))
+			is_special = 2;
+		else if (string_contains(wt->titlebuff, "Google"))
+				is_special = 2;
+	// }
 	if ( /*  wt->debug_commentary && */is_special) {
 		cout << "special = " << is_special << " for " << wt->filename << " =  "
 				<< wt->titlebuff << endl;
@@ -143,11 +152,9 @@ BOOL kill_window(Window_Tracking *wt) {
 	strcat(syscmd, wt->filename);
 	strcat(syscmd, "  /F");
 
-	cout << "(?)Kill window, special= " << wt->is_special << "for "
-			<< wt->namebuff << "with" << syscmd << endl;
 	cout << "(**)Kill window " << wt->titlebuff << "==" << wt->namebuff
 			<< "with" << syscmd << endl;
-	// system("pause");
+	system("pause");
 	system(syscmd);
 	// cout << "and back"; system("pause");
 	wt->win_killed_windows++;

@@ -1,8 +1,6 @@
 //============================================================================
 // Name        : Sys3.cpp
-// Author      : Charles Yarbrough
-// Version     : 0.1.0
-// Copyright   : (c) 2021
+// Author      : Charles Yarbroughe
 // Description : Alpha version of BlindSafe
 //============================================================================
 
@@ -22,6 +20,31 @@ void say_blindsafe_help() {
 	cout << " 'd'  for developer, doing who knows what!!" << endl;
 
 	cout << endl;
+}
+
+void do_developer_commands() {
+	// workbench/playground for looking arounc
+	char cmd[BUF_SIZE];
+	BOOL accepting_commands = true;
+   while (accepting_commands ) {
+	   cout << "developer_commands in" << endl;
+	   std::cin.getline(cmd, BUF_SIZE);
+	   cout <<"you said " <<cmd <<endl;
+	   switch ( cmd[0]) {
+	   case 'q': {  // back to blindsafe main loop
+		   accepting_commands = false;
+		   break;
+	   }
+	   case 's': { // system commands
+		   system( &cmd[1]);
+		   break;
+	   }
+	   default: {
+		   cout << "makes no sense to me" << endl;
+		   break;
+	   }
+}
+} // end of command loop
 }
 
 BOOL do_window_loop() {
@@ -94,6 +117,7 @@ int main(int argc, char *argv[]) {
 			}
 			case 'd': { // for developers
 				cout << "DEVEOPER? who are you trying to kid?" << endl;
+				do_developer_commands();
 				break;
 			}
 			default: { // whatever

@@ -130,6 +130,10 @@ void describe_window(HWND hWnd) {
 		wt->exe_name = is_exe(wt->namebuff);
 	}
 
+
+
+
+
 	if (string_contains(wt->titlebuff, "blindsafe")) {
 		wt->is_blindsafe_window = 1;
 	} else if (string_contains(wt->namebuff, "blindsafe")) {
@@ -141,15 +145,21 @@ void describe_window(HWND hWnd) {
 	}
 
 	if (wt->is_blindsafe_window) {
-		// cout << "blindsafe " << wt->titlebuff << "and" << wt->namebuff << endl;
+		if ( string_contains(wt->titlebuff, "Google") ||
+			  string_contains(wt->namebuff, "Google")) {
+		cout << "I dont understand: names "  << wt->namebuff << " == " << wt->titlebuff  << endl;
+		system("pause");
+		wt->is_blindsafe_window = false;
+		}
+		else {// cout << "blindsafe " << wt->titlebuff << "and" << wt->namebuff << endl;
 		wt->win_blindsafe_windows++;
 		wt->marks[5] = 'G';
-	}
+	} }
 
 	if (wt->has_title || wt->has_name) {
 		wt->win_count++;
 		wt->is_special = special_window(wt);
-		if ((wt->is_special == 0) || (wt->is_special == 2))
+		if (  /* (wt->is_special == 0) || */ (wt->is_special == 2))
 			should_kill_window = 1;
 		wt->marks[3] = 'W';
 		if (IsWindowVisible(hWnd)) {
@@ -212,8 +222,9 @@ void do_window(HWND hWnd) {
 			cout << std::setw(3) << std::dec << wt->win_count << "/"
 					<< std::setw(4) << std::dec << wt->win_total << "."
 					<< wt->marks << setw(10) << "pid= " << pid << std::hex
-					<< hWnd << " --> " << wt->titlebuff << " ==> "
-					<< wt->namebuff << endl;
+					<< " = " << hWnd
+					<< " --> " << wt->titlebuff
+					<< " ==> " << wt->namebuff << endl;
 		}
 	}
 	if (wt->show_window) {
@@ -222,13 +233,19 @@ void do_window(HWND hWnd) {
 		system(syscmd);
 	}
 
+#if 0
 	if ((wt->is_special == 1) || (wt->is_special == 3)) {
 		wt->win_saved_windows++;
-	} else {
-		// (special == 2) | | (special == 0)
-
-		if (wt->kill_window && wt->could_kill_window) {
+	}
+	else
+#endif
+	if (wt->kill_window && wt->could_kill_window) {
+		if ( (wt->is_special == 2) /*  || (wt->is_special == 0) */) {
 			kill_window(wt);
+		}
+		else {
+			cout << "what??" << endl;
+			system("pause");
 		}
 	}
 }
