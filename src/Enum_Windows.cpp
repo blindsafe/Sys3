@@ -34,7 +34,7 @@ void init_window_tracking(Window_Tracking *wtptr) {
 
 	wt->list_window = false;
 	wt->show_window = false;
-	wt->kill_window = 0;
+	wt->kill_window = false;
 
 	wt->win_total = 0;
 	wt->win_count = 0;
@@ -102,11 +102,10 @@ int is_exe(char string[]) {
 
 void describe_window(HWND hWnd) {
 
-	int should_kill_window = 0; // various reasons to not kill  window, tested below
 	wt->has_title = 1;
 	wt->has_name = 1;
 	wt->is_blindsafe_window = 0;
-
+	wt->is_kill_target = false;
 	wt->current_window = hWnd;
 	strcpy(wt->marks, "      ");
 
@@ -119,6 +118,10 @@ void describe_window(HWND hWnd) {
 	} else {
 		wt->exe_title = is_exe(wt->titlebuff);
 	}
+	// NB: sometimes namebuff returns the previous name so that
+	// we can get a titlebuff with "Google" but a namebuff that's the
+	// previous .exe, sometimes a Github
+	// see special coding in Github section
 	strcpy(wt->namebuff, "");
 	wt->exe_name = 0;
 	GetWindowModuleFileName(hWnd, (LPSTR) wt->namebuff,
@@ -130,52 +133,38 @@ void describe_window(HWND hWnd) {
 		wt->exe_name = is_exe(wt->namebuff);
 	}
 
-
-
-
-
-	if (string_contains(wt->titlebuff, "blindsafe")) {
-		wt->is_blindsafe_window = 1;
-	} else if (string_contains(wt->namebuff, "blindsafe")) {
-		wt->is_blindsafe_window = 1;
-	} else if (string_contains(wt->titlebuff, "github")) {
-		wt->is_blindsafe_window = 1;
-	} else if (string_contains(wt->namebuff, "github")) {
-		wt->is_blindsafe_window = 1;
-	}
-
-	if (wt->is_blindsafe_window) {
-		if ( string_contains(wt->titlebuff, "Google") ||
-			  string_contains(wt->namebuff, "Google")) {
-		cout << "I dont understand: names "  << wt->namebuff << " == " << wt->titlebuff  << endl;
-		system("pause");
-		wt->is_blindsafe_window = false;
-		}
-		else {// cout << "blindsafe " << wt->titlebuff << "and" << wt->namebuff << endl;
-		wt->win_blindsafe_windows++;
-		wt->marks[5] = 'G';
-	} }
-
 	if (wt->has_title || wt->has_name) {
 		wt->win_count++;
-		wt->is_special = special_window(wt);
-		if (  /* (wt->is_special == 0) || */ (wt->is_special == 2))
-			should_kill_window = 1;
+		wt->is_kill_target = is_kill_target_window(wt);
+		if (!wt->is_kill_target) {
+			// maybe it's one of ours . . . just curiousity
+			if (string_contains(wt->titlebuff, "blindsafe")) {
+				wt->is_blindsafe_window = 1;
+			} else if (string_contains(wt->namebuff, "blindsafe")) {
+				wt->is_blindsafe_window = 1;
+			} else if (string_contains(wt->titlebuff, "github")) {
+				wt->is_blindsafe_window = 1;
+			} else if (string_contains(wt->namebuff, "github")) {
+				wt->is_blindsafe_window = 1;
+			}
+			if (wt->is_blindsafe_window) {
+				wt->win_blindsafe_windows++;
+				wt->marks[5] = 'G';
+			}
+		}
+
 		wt->marks[3] = 'W';
 		if (IsWindowVisible(hWnd)) {
 			wt->marks[3] = 'V';
 
 			if (hWnd == wt->active_window) {
 				wt->marks[0] = 'A';
-				should_kill_window = 0;
 			}
 			if (hWnd == wt->focus_window) {
 				wt->marks[1] = 'F';
-				should_kill_window = 0;
 			}
 			if (hWnd == wt->forground_window) {
 				wt->marks[2] = '*';
-				should_kill_window = 0;
 			}
 
 			if (IsWindowEnabled(hWnd)) {
@@ -191,20 +180,8 @@ void describe_window(HWND hWnd) {
 		wt->marks[4] = 'H';
 	}
 
-	if (wt->is_blindsafe_window) {
-		should_kill_window = 0;
-	}
-	if (should_kill_window) {
-		if (!wt->has_name && !wt->has_title) {
-			cout << "Why kill this empty  window?";
-			should_kill_window = 0;
-		}
-	}
-
-	wt->could_kill_window = should_kill_window;
-
 	if (wt->debug_commentary) {
-		cout << " describe out with  " << wt->could_kill_window << "  "
+		cout << " describe out with  " << wt->is_kill_target << "  "
 				<< wt->kill_window << " with marks " << wt->marks
 				<< "and names = " << wt->namebuff << ", " << wt->titlebuff
 				<< endl;
@@ -222,9 +199,8 @@ void do_window(HWND hWnd) {
 			cout << std::setw(3) << std::dec << wt->win_count << "/"
 					<< std::setw(4) << std::dec << wt->win_total << "."
 					<< wt->marks << setw(10) << "pid= " << pid << std::hex
-					<< " = " << hWnd
-					<< " --> " << wt->titlebuff
-					<< " ==> " << wt->namebuff << endl;
+					<< " = " << hWnd << " --> " << wt->titlebuff << " ==> "
+					<< wt->namebuff << endl;
 		}
 	}
 	if (wt->show_window) {
@@ -233,19 +209,11 @@ void do_window(HWND hWnd) {
 		system(syscmd);
 	}
 
-#if 0
-	if ((wt->is_special == 1) || (wt->is_special == 3)) {
-		wt->win_saved_windows++;
-	}
-	else
-#endif
-	if (wt->kill_window && wt->could_kill_window) {
-		if ( (wt->is_special == 2) /*  || (wt->is_special == 0) */) {
+	if (wt->kill_window) {
+		if (wt->is_kill_target) {
 			kill_window(wt);
-		}
-		else {
-			cout << "what??" << endl;
-			system("pause");
+		} else {
+			// leave sleeping dogs lie
 		}
 	}
 }

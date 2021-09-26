@@ -54,7 +54,6 @@ struct Window_Tracking {
 	 * Stuff about the current window
 	 */
 	HWND current_window;
-	int could_kill_window = 0;
 	char titlebuff[BUF_SIZE];
 	char namebuff[BUF_SIZE];
 	char filename[BUF_SIZE];
@@ -65,7 +64,7 @@ struct Window_Tracking {
 	int has_title = 0;
 	int exe_name = 0;
 	BOOL has_name = FALSE;
-	int is_special = 0;
+	BOOL is_kill_target = FALSE;
 	BOOL is_blindsafe_window = FALSE;
 };
 

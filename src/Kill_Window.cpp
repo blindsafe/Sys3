@@ -22,127 +22,48 @@ BOOL string_contains(const char *target_string, const char *test_string) {
 //	}
 }
 
-// Classifies a window based on tracking parameters
-// Classification is: 1=yes, don't kill, 2=do kill, 0 = don't know
-int special_window(const Window_Tracking *wt) {
+// is this a window we want to kill?
+BOOL is_kill_target_window(const Window_Tracking *wt) {
 	// by painful discovery, some windows aren't to be canceled
 	// but others definitely want to be!
-	int is_special = 0;  // 1=yes, don't kill, 2=do kill, 0 = don't know
+	BOOL is_kill_target = false;
 
-#if 0 // interesting, but shouldnt be necessary
-	if (wt->is_blindsafe_window)
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "Default"))
-		is_special = 3;  // special recognition for this common case
-	else if (string_contains(wt->namebuff, "Default"))
-		is_special = 3;  // special recognition for this common case
-	// all these should be left alone
-	else if (string_contains(wt->titlebuff, "Window"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "Battery Meter"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "{"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, ".NET"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "#"))
-		is_special = 1;
+	// cout << "test  " << wt->titlebuff << " -- " << wt->namebuff << endl;
 
-	// order is important here: get rid of lines with both
+	if (string_contains(wt->titlebuff, "Notepad"))
+		is_kill_target = true;
+	else if (string_contains(wt->titlebuff, "Word"))
+		is_kill_target = true;
+	else if ((wt->titlebuff[0] == 'W') && (wt->titlebuff[1] == '\0')) {
+		cout << "this appears to be Word?" << endl;
+		is_kill_target = true;
+	} else if (string_contains(wt->titlebuff, "Explorer")) {
+		if (string_contains(wt->titlebuff, "File")) {
+			// if we kill File Explorer we lose the ribbon at the bottom
+			// what to do ??
+		} else
+			is_kill_target = true;
+	} else if (string_contains(wt->titlebuff, "Outlook"))
+		is_kill_target = true;
+	else if (string_contains(wt->titlebuff, "Bing"))
+		is_kill_target = true;
 	else if (string_contains(wt->titlebuff, "Edge"))
-		is_special = 2;
+		is_kill_target = true;
+	else if (string_contains(wt->titlebuff, "Google"))
+		is_kill_target = true;
 	else if (string_contains(wt->titlebuff, "Microsoft"))
-		is_special = 1;
-
-	else if (string_contains(wt->titlebuff, "Cicero"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "McPlatform"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "GDI"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "Realtek"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "SecurityHealth"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "AccEvent"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "Settings"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "The Event"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "fsATP"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "TaskHost"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "DWM"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "Network Flyout"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "Mail"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "Add an account"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "Form"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "CCleaner"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "DDE"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "OneDrive"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "PartR"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "Program Manager"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "MS_Web"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "Eclipse"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "Freedom"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "JFW"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "ITEM"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "FSIScanner"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "FSCAM"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "JAWS"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "File Explorer"))
-		is_special = 1;
-	else if (string_contains(wt->titlebuff, "Alexa"))
-		is_special = 1;
-
-	if (!is_special) {	// these definitely want to be killed
-#endif
-
-		cout << "test  " <<  wt->titlebuff << " -- " << wt->namebuff << endl;
-
-		if (string_contains(wt->titlebuff, "Notepad"))
-			is_special = 2;
-		else if (string_contains(wt->titlebuff, "Word"))
-			is_special = 2;
-		else if ((wt->titlebuff[0] == 'W') && (wt->titlebuff[1] == '\0'))
-			is_special = 2;
-		else if (string_contains(wt->titlebuff, "Explorer"))
-			is_special = 2;
-		else if (string_contains(wt->titlebuff, "Outlook"))
-			is_special = 2;
-		else if (string_contains(wt->titlebuff, "Bing"))
-			is_special = 2;
-		else if (string_contains(wt->titlebuff, "Edge"))
-			is_special = 2;
-		else if (string_contains(wt->titlebuff, "Google"))
-				is_special = 2;
+		is_kill_target = true;
+	else if (string_contains(wt->titlebuff, "Maps"))
+		is_kill_target = true;
+	else if (string_contains(wt->titlebuff, "Command"))
+		is_kill_target = true;
 	// }
-	if ( /*  wt->debug_commentary && */is_special) {
-		cout << "special = " << is_special << " for " << wt->filename << " =  "
-				<< wt->titlebuff << endl;
-		//  system( "pause");
+	if (wt->debug_commentary && is_kill_target) {
+		cout << "special = " << is_kill_target << " for " << wt->filename
+				<< " =  " << wt->titlebuff << endl;
+		system("pause");
 	}
-	return is_special;
+	return is_kill_target;
 }
 
 BOOL kill_window(Window_Tracking *wt) {
@@ -156,7 +77,8 @@ BOOL kill_window(Window_Tracking *wt) {
 			<< "with" << syscmd << endl;
 	system("pause");
 	system(syscmd);
-	// cout << "and back"; system("pause");
+	cout << "and back";
+	system("pause");
 	wt->win_killed_windows++;
 	killed = TRUE;
 
