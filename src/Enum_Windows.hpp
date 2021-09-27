@@ -17,8 +17,6 @@ using namespace std;
 #define BUF_SIZE 256  // universal buffer character size for names and commands
 
 // See https://www.geeksforgeeks.org/enumeration-enum-c/
-// 0 = initial state, 1 = yes, 2 = just say what you would do
-// 0 = no, 1 = yes, save, 2 = definitely kill, 3 = yes, save, is "default"
 //enum Window_Type {
 //	W_NO, W_YES, W_KILL, W_YES_DEFAULT
 //};
@@ -29,7 +27,7 @@ struct Window_Tracking {
 	 */
 	BOOL list_window = FALSE;
 	BOOL show_window = FALSE;
-	int kill_window = 0; //  0 = initial state, 1 = yes, 2 = just say what you would do
+	BOOL kill_window = FALSE;
 	BOOL debug_commentary = FALSE;
 
 	/*
@@ -58,11 +56,9 @@ struct Window_Tracking {
 	char namebuff[BUF_SIZE];
 	char filename[BUF_SIZE];
 
-	// marks[1] =
+	// marks[1] = for developers, subject to change at whim
 	char marks[7] = { ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
-	int exe_title = 0;
-	int has_title = 0;
-	int exe_name = 0;
+	BOOL has_title = false;
 	BOOL has_name = FALSE;
 	BOOL is_kill_target = FALSE;
 	BOOL is_blindsafe_window = FALSE;

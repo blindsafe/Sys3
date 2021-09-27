@@ -9,21 +9,20 @@
 struct Window_Tracking wtrk;
 
 void say_blindsafe_help() {
+	// command list for the basic loop of main()
 	cout << endl;
 	cout << "blindsafe help" << endl << endl;
-
 	cout << " 'h' for help" << endl;
 	cout << " 's'  for shutdown, closing all windows" << endl;
 	cout << " 'r'  for reboot , closing all windows" << endl;
 	cout << " 'c'  for cleanup ,	 closing all windows" << endl;
 	cout << " 'e'  exit blindsafe" << endl;
 	cout << " 'd'  for developer, doing who knows what!!" << endl;
-
 	cout << endl;
 }
 
 void do_developer_commands() {
-	// workbench/playground for looking arounc
+	//separate  workbench/playground for developers to test things
 	char cmd[BUF_SIZE];
 	BOOL accepting_commands = true;
 	while (accepting_commands) {
@@ -47,8 +46,10 @@ void do_developer_commands() {
 	} // end of command loop
 }
 
-BOOL do_window_loop() {
-	cout << endl << "---- Starting enumeration loop! ----" << endl;
+BOOL do_window_enum() {
+	// all access to WindowsProcs comes thru here
+	// switches and values set in wtrk by the caller specify whats to be done
+	cout << endl << "---- do_window_loop() ----" << endl;
 	BOOL result = EnumWindows(EnumWindowsProc, 0);
 	cout << endl << "Done [result: " << result << "] and  " << std::dec
 			<< wtrk.win_count << " of " << wtrk.win_total << " with mixed "
@@ -58,10 +59,11 @@ BOOL do_window_loop() {
 			<< endl;
 	//  system("pause");
 	return result;
-
 }
 
-void do_window_list(const char command_char) {
+void first_do_window_enum(const char command_char) {
+	// various commands want a tour, sometimes then followed by
+	// more to do
 	init_window_tracking(&wtrk);   // Pointer to global shared variables
 	switch (command_char) {
 	case 's':
@@ -69,7 +71,7 @@ void do_window_list(const char command_char) {
 	case 'c': {
 		wtrk.list_window = true;
 		wtrk.kill_window = 1;
-		do_window_loop();
+		do_window_enum();
 		switch (command_char) {
 		case 's': { // shutdown
 			system("shutdown /s /f /t 0");
@@ -108,7 +110,7 @@ int main(int argc, char *argv[]) {
 			case 's':   // shutdown
 			case 'r': { // reboot
 						// kill, list, first
-				do_window_list(command_char);
+				first_do_window_enum(command_char);
 				break;
 			}
 			case 'e': { // exit

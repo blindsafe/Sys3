@@ -7,9 +7,10 @@
 
 #include "Kill_Window.hpp"
 
-struct Window_Tracking *wt;
+struct Window_Tracking *wt;  // global storage
 
 void setupKnownWIndows() {
+	// one time, at the beginning
 	// One window has the focus -- the one that's first in line to get keyboard events.
 	// The outer window (that the user can drag around the screen) is "active"
 	// if one of its subwindows has the focus, but it might or might not have focus itself.
@@ -26,6 +27,8 @@ void setupKnownWIndows() {
 }
 
 void init_window_tracking(Window_Tracking *wtptr) {
+	// at the beginning of every enum_proc we set up how to keep track
+	// of things.
 	wt = wtptr;
 	if (wt->active_window == 0) {
 		// first time in
@@ -43,120 +46,69 @@ void init_window_tracking(Window_Tracking *wtptr) {
 	wt->win_blindsafe_windows = 0;
 	wt->win_saved_windows = 0;
 	wt->win_killed_windows = 0;
-
-	wt->focus_window = 0;
-	wt->forground_window = 0;
 }
 
 Window_Tracking* get_window_tracking() {
+	// someone wants to know where the global storage is
 	return wt;
 }
 
-int string_begin(char full_string[], char test_string[]) {
-	// does test_string start full_string?
-	int test_len = strlen(test_string);
-	int full_len = strlen(full_string);
-	int is_same = 0;
-	char save_char;
-	if (full_len >= test_len) {
-		save_char = full_string[test_len];
-		full_string[test_len] = 0;
-		if (strcmp(full_string, test_string) == 0) {
-			is_same = 1;
-		}
-		full_string[test_len] = save_char;
+void check_if_blindsafe() {
+	// maybe it's one of ours . . . just curiosity
+	if (string_contains(wt->titlebuff, "blindsafe")) {
+		wt->is_blindsafe_window = 1;
+	} else if (string_contains(wt->namebuff, "blindsafe")) {
+		wt->is_blindsafe_window = 1;
+	} else if (string_contains(wt->titlebuff, "github")) {
+		wt->is_blindsafe_window = 1;
+	} else if (string_contains(wt->namebuff, "github")) {
+		wt->is_blindsafe_window = 1;
 	}
-	return is_same;
-}
-
-int is_exe(char string[]) {
-	// name might end in ".exe" or ".exe)"
-	int len = strlen(string);
-	char exe_string[] = ".exe";
-	char end_string[5];
-	int rtn = 0;
-	int copied_5 = 0;
-	// if ( wt->debug_commentary ) cout << "--?is_exe("
-	//                                                               << std::dec << len << ": " << string << " vs " << exe_string << ".";
-	if (len >= 4) {
-		if (len >= 5) {
-			if (string[len - 1] == ')') {
-				strcpy(end_string, &string[len - 5]);
-				end_string[4] = '\0';
-				copied_5 = 1;
-			}
-		}
-		if (!copied_5) {
-			strcpy(end_string, &string[len - 4]);
-		}
-		if (wt->debug_commentary)
-			cout << ") with " << end_string << " vs " << exe_string << ".";
-		if (strcmp(end_string, exe_string) == 0)
-			rtn = 1;
+	if (wt->is_blindsafe_window) {
+		wt->win_blindsafe_windows++;
+		wt->marks[5] = 'G';
 	}
-	// if ( wt->debug_commentary ) {
-	//	if (rtn ) cout << " yes"; else cout << " no"; cout << endl;
-	//}
-	return rtn;
 }
 
 void describe_window(HWND hWnd) {
 
-	wt->has_title = 1;
-	wt->has_name = 1;
-	wt->is_blindsafe_window = 0;
+	wt->has_title = false;
+	wt->has_name = false;
+	wt->is_blindsafe_window = false;
 	wt->is_kill_target = false;
 	wt->current_window = hWnd;
 	strcpy(wt->marks, "      ");
 
 	strcpy(wt->titlebuff, "");
-	wt->exe_title = 0;
 	GetWindowText(hWnd, (LPSTR) wt->titlebuff, sizeof(wt->titlebuff) - 1);
 	if (strlen(wt->titlebuff) < 1) {
 		strcpy(wt->titlebuff, "[NO TITLE]");
-		wt->has_title = 0;
 	} else {
-		wt->exe_title = is_exe(wt->titlebuff);
+		wt->has_title = true;
 	}
 	// NB: sometimes namebuff returns the previous name so that
 	// we can get a titlebuff with "Google" but a namebuff that's the
 	// previous .exe, sometimes a Github
 	// see special coding in Github section
 	strcpy(wt->namebuff, "");
-	wt->exe_name = 0;
 	GetWindowModuleFileName(hWnd, (LPSTR) wt->namebuff,
 			sizeof(wt->namebuff) - 1);
 	if (strlen(wt->namebuff) < 1) {
 		strcpy(wt->namebuff, "[NO MODULE]");
-		wt->has_name = 0;
 	} else {
-		wt->exe_name = is_exe(wt->namebuff);
+		wt->has_name = true;
 	}
 
 	if (wt->has_title || wt->has_name) {
 		wt->win_count++;
 		wt->is_kill_target = is_kill_target_window(wt);
 		if (!wt->is_kill_target) {
-			// maybe it's one of ours . . . just curiousity
-			if (string_contains(wt->titlebuff, "blindsafe")) {
-				wt->is_blindsafe_window = 1;
-			} else if (string_contains(wt->namebuff, "blindsafe")) {
-				wt->is_blindsafe_window = 1;
-			} else if (string_contains(wt->titlebuff, "github")) {
-				wt->is_blindsafe_window = 1;
-			} else if (string_contains(wt->namebuff, "github")) {
-				wt->is_blindsafe_window = 1;
-			}
-			if (wt->is_blindsafe_window) {
-				wt->win_blindsafe_windows++;
-				wt->marks[5] = 'G';
-			}
+			check_if_blindsafe();
 		}
 
 		wt->marks[3] = 'W';
 		if (IsWindowVisible(hWnd)) {
 			wt->marks[3] = 'V';
-
 			if (hWnd == wt->active_window) {
 				wt->marks[0] = 'A';
 			}
