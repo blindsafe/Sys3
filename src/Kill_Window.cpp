@@ -8,15 +8,15 @@
 #include "Kill_Window.hpp"
 #include <cstring>
 
-BOOL string_contains(const char *target_string, const char *test_string) {
+bool string_contains(const char *target_string, const char *test_string) {
 	return !!(strstr(target_string, test_string));
 }
 
 // is this a window we want to kill?
-BOOL is_kill_target_window(const Window_Tracking *wt) {
+bool is_kill_target_window(const Window_Tracking *wt) {
 	// by painful discovery, some windows aren't to be canceled
 	// but others definitely want to be!
-	BOOL is_kill_target = false;
+	bool is_kill_target = false;
 
 	// cout << "test  " << wt->titlebuff << " -- " << wt->namebuff << endl;
 
@@ -56,9 +56,9 @@ BOOL is_kill_target_window(const Window_Tracking *wt) {
 	return is_kill_target;
 }
 
-BOOL kill_window(Window_Tracking *wt) {
+bool kill_window(Window_Tracking *wt) {
 	//  kill the current window
-	int killed = FALSE;
+	int killed = false;
 	char syscmd[BUF_SIZE] = " taskkill /PID ";
 	strcat(syscmd, wt->filename);
 	strcat(syscmd, "  /F");
@@ -74,7 +74,7 @@ BOOL kill_window(Window_Tracking *wt) {
 		system("pause");
 	}
 	wt->win_killed_windows++;
-	killed = TRUE;
+	killed = true;
 
 	return !!killed;
 }

@@ -24,7 +24,7 @@ void say_blindsafe_help() {
 void do_developer_commands() {
 	//separate  workbench/playground for developers to test things
 	char cmd[BUF_SIZE];
-	BOOL accepting_commands = true;
+	bool accepting_commands = true;
 	while (accepting_commands) {
 		cout << "developer_commands in" << endl;
 		std::cin.getline(cmd, BUF_SIZE);
@@ -50,11 +50,11 @@ void do_developer_commands() {
 	} // end of command loop
 }
 
-BOOL do_window_enum() {
+bool do_window_enum() {
 	// all access to WindowsProcs comes thru here
 	// switches and values set in wtrk by the caller specify whats to be done
 	cout << endl << "---- do_window_loop() ----" << endl;
-	BOOL result = EnumWindows(EnumWindowsProc, 0);
+	bool result = EnumWindows(EnumWindowsProc, 0);
 	cout << endl << "Done [result: " << result << "] and  " << std::dec
 			<< wtrk.win_count << " of " << wtrk.win_total << " with mixed "
 			<< wtrk.win_mixed << " hidden " << wtrk.win_hidden_count << endl
@@ -95,7 +95,7 @@ void first_do_window_enum(const char command_char) {
 
 int main(int argc, char *argv[]) {
 	char cmd[BUF_SIZE];
-	BOOL accepting_commands = true;
+	bool accepting_commands = true;
 
 	while (accepting_commands) {
 		cout << "blindsafe 1.01 here: what is your wish? ('h' for help)" << endl

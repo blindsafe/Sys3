@@ -25,10 +25,10 @@ struct Window_Tracking {
 	/*
 	 * Global variables directing actions
 	 */
-	BOOL list_window = FALSE;
-	BOOL show_window = FALSE;
-	BOOL kill_window = FALSE;
-	BOOL debug_commentary = FALSE;
+	bool list_window = false;
+	bool show_window = false;
+	bool kill_window = false;
+	bool debug_commentary = false;
 
 	/*
 	 * Global variables tracking  window counts
@@ -58,10 +58,10 @@ struct Window_Tracking {
 
 	// marks[1] = for developers, subject to change at whim
 	char marks[7] = { ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
-	BOOL has_title = false;
-	BOOL has_name = FALSE;
-	BOOL is_kill_target = FALSE;
-	BOOL is_blindsafe_window = FALSE;
+	bool has_title = false;
+	bool has_name = false;
+	bool is_kill_target = false;
+	bool is_blindsafe_window = false;
 };
 
 Window_Tracking* get_window_tracking();

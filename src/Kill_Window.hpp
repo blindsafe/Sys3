@@ -15,10 +15,10 @@ using namespace std;
 
 #include "Enum_Windows.hpp"
 
-BOOL string_contains(const char *target_string, const char *test_string);
+bool string_contains(const char *target_string, const char *test_string);
 
-BOOL kill_window(Window_Tracking *wt);
+bool kill_window(Window_Tracking *wt);
 
-BOOL is_kill_target_window(const Window_Tracking *wt);
+bool is_kill_target_window(const Window_Tracking *wt);
 
 #endif /* KILL_WINDOW_HPP_ */
