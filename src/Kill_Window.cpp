@@ -10,16 +10,6 @@
 
 BOOL string_contains(const char *target_string, const char *test_string) {
 	return !!(strstr(target_string, test_string));
-//	char *match = strstr(target_string, test_string);
-//	if (match) {
-//		if (FALSE) {
-//			cout << " test match = " << " for test_string " << test_string
-//					<< "and " << target_string << "and matches!" << endl;
-//		}
-//		return TRUE;
-//	} else {
-//		return FALSE;
-//	}
 }
 
 // is this a window we want to kill?
@@ -67,18 +57,22 @@ BOOL is_kill_target_window(const Window_Tracking *wt) {
 }
 
 BOOL kill_window(Window_Tracking *wt) {
-	// if fails a last minute exception test,  kill the current window
+	//  kill the current window
 	int killed = FALSE;
 	char syscmd[BUF_SIZE] = " taskkill /PID ";
 	strcat(syscmd, wt->filename);
 	strcat(syscmd, "  /F");
 
-	cout << "(**)Kill window " << wt->titlebuff << "==" << wt->namebuff
-			<< "with" << syscmd << endl;
-	system("pause");
+	if (wt->debug_commentary) {
+		cout << "(**)Kill window " << wt->titlebuff << "==" << wt->namebuff
+				<< "with" << syscmd << endl;
+		system("pause");
+	}
 	system(syscmd);
-	cout << "and back";
-	system("pause");
+	if (wt->debug_commentary) {
+		cout << "and back" << endl;
+		system("pause");
+	}
 	wt->win_killed_windows++;
 	killed = TRUE;
 

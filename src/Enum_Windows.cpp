@@ -71,6 +71,7 @@ void check_if_blindsafe() {
 }
 
 void describe_window(HWND hWnd) {
+	// look it over and decide what it is
 
 	wt->has_title = false;
 	wt->has_name = false;
@@ -141,7 +142,7 @@ void describe_window(HWND hWnd) {
 }
 
 void do_window(HWND hWnd) {
-// everything below is about the HWND we have in hand
+// everything below is stuff to with with the HWND we have in hand
 	long unsigned int pid = 0;
 	GetWindowThreadProcessId(hWnd, &pid);
 	string filename = to_string(pid);

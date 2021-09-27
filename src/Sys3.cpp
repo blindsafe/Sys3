@@ -38,6 +38,10 @@ void do_developer_commands() {
 			system(&cmd[1]);
 			break;
 		}
+		case 'd': { // debug
+			wtrk.debug_commentary = true;
+			break;
+		}
 		default: {
 			cout << "makes no sense to me" << endl;
 			break;
