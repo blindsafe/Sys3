@@ -29,6 +29,7 @@ struct Window_Tracking {
 	bool show_window = false;
 	bool kill_window = false;
 	bool debug_commentary = false;
+	bool search_for_window = false;
 
 	/*
 	 * Global variables tracking  window counts
@@ -47,6 +48,7 @@ struct Window_Tracking {
 	HWND active_window = 0;
 	HWND focus_window = 0;
 	HWND forground_window = 0;
+	HWND search_window = 0;
 
 	/*
 	 * Stuff about the current window
@@ -55,6 +57,7 @@ struct Window_Tracking {
 	char titlebuff[BUF_SIZE];
 	char namebuff[BUF_SIZE];
 	char filename[BUF_SIZE];
+	char searchname[BUF_SIZE];
 
 	// marks[1] = for developers, subject to change at whim
 	char marks[7] = { ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
@@ -62,6 +65,7 @@ struct Window_Tracking {
 	bool has_name = false;
 	bool is_kill_target = false;
 	bool is_blindsafe_window = false;
+    int extra_search_windows = 0;
 };
 
 Window_Tracking* get_window_tracking();

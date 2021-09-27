@@ -38,6 +38,11 @@ void init_window_tracking(Window_Tracking *wtptr) {
 	wt->list_window = false;
 	wt->show_window = false;
 	wt->kill_window = false;
+	wt->search_for_window = false;
+	wt->extra_search_windows = 0;
+
+	wt->search_window = 0;
+	strcpy(wt->searchname, "");
 
 	wt->win_total = 0;
 	wt->win_count = 0;
@@ -167,6 +172,25 @@ void do_window(HWND hWnd) {
 			kill_window(wt);
 		} else {
 			// leave sleeping dogs lie
+		}
+	}
+	if (wt->search_for_window) {
+		// return the first window that matches
+		// with the notable exception of blindsafe itself!
+		if (string_contains(wt->titlebuff, wt->searchname)) {
+			cout << "this might be it we're looking for " << wt->titlebuff
+					<< " at " << wt->forground_window << " vs " << hWnd << endl;
+			if (wt->forground_window == hWnd) {
+				// what we expect for blindsafe, and nothing else
+				// which means that for blindsafe, we return the first previous windows
+				cout << " That's us!!' " << endl;
+			} else {
+				if (wt->search_window) {
+					++wt->extra_search_windows;
+				} else {
+					wt->search_window = hWnd;
+				}
+			}
 		}
 	}
 }

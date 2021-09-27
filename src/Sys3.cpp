@@ -93,9 +93,36 @@ void first_do_window_enum(const char command_char) {
 	}
 }
 
+BOOL am_i_in_already() {
+	BOOL in_already_or_not = false;
+	cout << "am_i_in_alread?" << endl;
+	system("pause");
+	init_window_tracking(&wtrk);   // Pointer to global shared variables
+	wtrk.search_for_window = true;
+	// wtrk.list_window = true; // for debugging
+
+	strcpy(wtrk.searchname, "blindsafe");
+	do_window_enum();
+	if (wtrk.search_window) {
+		cout << "previous " << wtrk.extra_search_windows + 1 << " blindsafe windows"
+				<< endl;
+		in_already_or_not = true;
+	}
+	return in_already_or_not;
+
+}
 int main(int argc, char *argv[]) {
 	char cmd[BUF_SIZE];
 	bool accepting_commands = true;
+
+	if (am_i_in_already()) {
+		cout << "how do i switch over to " << wtrk.search_window << endl;
+		if (wtrk.extra_search_windows) {
+			cout << "and what do i do about the " << wtrk.extra_search_windows
+					<< " xtras?" << endl;
+		}
+		system("pause");
+	}
 
 	while (accepting_commands) {
 		cout << "blindsafe 1.01 here: what is your wish? ('h' for help)" << endl
