@@ -76,4 +76,10 @@ void init_window_tracking(Window_Tracking *wtptr);
 
 BOOL CALLBACK EnumWindowsProc(const HWND hWnd, const long lParam);
 
+bool do_window_enum();
+
+void do_window_enum_plus(const char command_char);
+
+void do_launch_or_join_window();
+
 #endif /* ENUM_WINDOWS_HPP_ */

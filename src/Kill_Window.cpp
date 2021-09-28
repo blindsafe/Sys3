@@ -12,7 +12,7 @@ bool string_contains(const char *target_string, const char *test_string) {
 	return !!(strstr(target_string, test_string));
 }
 
-// is this a window we want to kill?
+// is this a window we might want to kill?
 bool is_kill_target_window(const Window_Tracking *wt) {
 	// by painful discovery, some windows aren't to be canceled
 	// but others definitely want to be!
@@ -25,7 +25,7 @@ bool is_kill_target_window(const Window_Tracking *wt) {
 	else if (string_contains(wt->titlebuff, "Word"))
 		is_kill_target = true;
 	else if ((wt->titlebuff[0] == 'W') && (wt->titlebuff[1] == '\0')) {
-		cout << "this appears to be Word?" << endl;
+		// cout << "this appears to be Word?" << endl;
 		is_kill_target = true;
 	} else if (string_contains(wt->titlebuff, "Explorer")) {
 		if (string_contains(wt->titlebuff, "File")) {
@@ -48,11 +48,12 @@ bool is_kill_target_window(const Window_Tracking *wt) {
 	else if (string_contains(wt->titlebuff, "Command"))
 		is_kill_target = true;
 	// }
-	if (wt->debug_commentary && is_kill_target) {
-		cout << "special = " << is_kill_target << " for " << wt->filename
-				<< " =  " << wt->titlebuff << endl;
-		system("pause");
+	// if (wt->debug_commentary && is_kill_target) {
+	if (is_kill_target) {
+		cout << "special = " << wt->filename << " =  " << wt->titlebuff << endl;
+		// system("pause");
 	}
+
 	return is_kill_target;
 }
 

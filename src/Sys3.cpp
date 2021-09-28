@@ -16,6 +16,7 @@ void say_blindsafe_help() {
 	cout << " 's'  for shutdown, closing all windows" << endl;
 	cout << " 'r'  for reboot , closing all windows" << endl;
 	cout << " 'c'  for cleanup ,	 closing all windows" << endl;
+	cout << "' l'  for launch or join an app" << endl;
 	cout << " 'e'  exit blindsafe" << endl;
 	cout << " 'd'  for developer, doing who knows what!!" << endl;
 	cout << endl;
@@ -50,49 +51,6 @@ void do_developer_commands() {
 	} // end of command loop
 }
 
-bool do_window_enum() {
-	// all access to WindowsProcs comes thru here
-	// switches and values set in wtrk by the caller specify whats to be done
-	cout << endl << "---- do_window_loop() ----" << endl;
-	bool result = EnumWindows(EnumWindowsProc, 0);
-	cout << endl << "Done [result: " << result << "] and  " << std::dec
-			<< wtrk.win_count << " of " << wtrk.win_total << " with mixed "
-			<< wtrk.win_mixed << " hidden " << wtrk.win_hidden_count << endl
-			<< "   and  blindsafe " << wtrk.win_blindsafe_windows << "  killed "
-			<< wtrk.win_killed_windows << "  saved " << wtrk.win_saved_windows
-			<< endl;
-	//  system("pause");
-	return result;
-}
-
-void first_do_window_enum(const char command_char) {
-	// various commands want a tour, sometimes then followed by
-	// more to do
-	init_window_tracking(&wtrk);   // Pointer to global shared variables
-	switch (command_char) {
-	case 's':
-	case 'r':
-	case 'c': {
-		wtrk.list_window = true;
-		wtrk.kill_window = 1;
-		do_window_enum();
-		switch (command_char) {
-		case 's': { // shutdown
-			system("shutdown /s /f /t 0");
-			break;
-		}
-		case 'r': {
-			system("shutdown /r /f /t 0");
-			break;
-		}
-		case 'c': {
-			break;
-		}
-		}
-	}
-	}
-}
-
 BOOL am_i_in_already() {
 	BOOL in_already_or_not = false;
 	cout << "am_i_in_alread?" << endl;
@@ -104,8 +62,8 @@ BOOL am_i_in_already() {
 	strcpy(wtrk.searchname, "blindsafe");
 	do_window_enum();
 	if (wtrk.search_window) {
-		cout << "previous " << wtrk.extra_search_windows + 1 << " blindsafe windows"
-				<< endl;
+		cout << "previous " << wtrk.extra_search_windows + 1
+				<< " blindsafe windows" << endl;
 		in_already_or_not = true;
 	}
 	return in_already_or_not;
@@ -116,11 +74,14 @@ int main(int argc, char *argv[]) {
 	bool accepting_commands = true;
 
 	if (am_i_in_already()) {
+#if 0
 		cout << "how do i switch over to " << wtrk.search_window << endl;
 		if (wtrk.extra_search_windows) {
 			cout << "and what do i do about the " << wtrk.extra_search_windows
 					<< " xtras?" << endl;
 		}
+#endif
+		cout << "we only need one of me, so I killed my older brothers" << endl;
 		system("pause");
 	}
 
@@ -139,13 +100,19 @@ int main(int argc, char *argv[]) {
 			switch (command_char) {
 			case 'c':  // cleanup
 			case 's':   // shutdown
-			case 'r': { // reboot
-						// kill, list, first
-				first_do_window_enum(command_char);
+			case 'r':  // reboot
+
+			{
+				do_window_enum_plus(command_char);
 				break;
 			}
 			case 'e': { // exit
 				accepting_commands = false;
+				break;
+			}
+			case 'l': {
+				// launch or join
+				do_launch_or_join_window();
 				break;
 			}
 			case 'd': { // for developers

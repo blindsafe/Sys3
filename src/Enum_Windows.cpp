@@ -185,7 +185,11 @@ void do_window(HWND hWnd) {
 				// which means that for blindsafe, we return the first previous windows
 				cout << " That's us!!' " << endl;
 			} else {
-				if (wt->search_window) {
+				if (wt->is_blindsafe_window) {
+					// special case: we only need the current one
+					cout << "previous blindsafe window to be discarded" << endl;
+					kill_window(wt);
+				} else if (wt->search_window) {
 					++wt->extra_search_windows;
 				} else {
 					wt->search_window = hWnd;
@@ -202,3 +206,69 @@ BOOL CALLBACK EnumWindowsProc(HWND hWnd, long lParam) {
 	return TRUE;
 }
 
+bool do_window_enum() {
+	// all access to WindowsProcs comes thru here
+	// switches and values set in wtrk by the caller specify whats to be done
+	cout << endl << "---- do_window_loop() ----" << endl;
+	bool result = EnumWindows(EnumWindowsProc, 0);
+	cout << endl << "Done [result: " << result << "] and  " << std::dec
+			<< wt->win_count << " of " << wt->win_total << " with mixed "
+			<< wt->win_mixed << " hidden " << wt->win_hidden_count << endl
+			<< "   and  blindsafe " << wt->win_blindsafe_windows << "  killed "
+			<< wt->win_killed_windows << "  saved " << wt->win_saved_windows
+			<< endl;
+	//  system("pause");
+	return result;
+}
+
+void do_window_enum_plus(const char command_char) {
+	// various commands want a tour, sometimes then followed by
+	// more to do
+	init_window_tracking(wt);   // Pointer to global shared variables
+	switch (command_char) {
+	case 's':
+	case 'r':
+	case 'c': {
+		wt->list_window = true;
+		wt->kill_window = 1;
+		do_window_enum();
+		switch (command_char) {
+		case 's': { // shutdown
+			system("shutdown /s /f /t 0");
+			break;
+		}
+		case 'r': {
+			system("shutdown /r /f /t 0");
+			break;
+		}
+		case 'c': {
+			break;
+		}
+		}
+	}
+	}
+}
+
+void do_launch_or_join_window() {
+	// if the app already exists, move to it
+	// else launch it
+	// useful for things like outlook and notepad which start multiple copies
+	char appname[BUF_SIZE];
+	init_window_tracking(wt);   // Pointer to global shared variables
+	cin >> appname;
+	cout << "looking for " << appname << endl;
+	wt->search_for_window = true;
+	wt->list_window = true; // for debugging
+	strcpy(wt->searchname, appname);
+	do_window_enum();
+	if (wt->search_window) {
+		cout << "we found one!, now what?" << endl;
+		if (wt->extra_search_windows) {
+			cout << "and what do i do about the " << wt->extra_search_windows
+					<< " xtras?" << endl;
+		}
+	} else {
+		cout << "we need to launch " << appname << endl;
+	}
+	system("pause");
+}
