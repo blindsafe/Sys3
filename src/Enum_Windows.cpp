@@ -59,7 +59,7 @@ Window_Tracking* get_window_tracking() {
 }
 
 void check_if_blindsafe() {
-	// maybe it's one of ours . . . just curiosity
+	// maybe it's one of ours . . . but it's just curiosity
 	if (string_contains(wt->titlebuff, "blindsafe")) {
 		wt->is_blindsafe_window = 1;
 	} else if (string_contains(wt->namebuff, "blindsafe")) {
@@ -72,6 +72,13 @@ void check_if_blindsafe() {
 	if (wt->is_blindsafe_window) {
 		wt->win_blindsafe_windows++;
 		wt->marks[5] = 'G';
+	}
+}
+
+void tolower_string ( char *s ) {
+	char *ss = s;
+	while  ( * ss ) {
+		*ss = tolower( *ss);  ss++;
 	}
 }
 
@@ -90,6 +97,7 @@ void describe_window(HWND hWnd) {
 	if (strlen(wt->titlebuff) < 1) {
 		strcpy(wt->titlebuff, "[NO TITLE]");
 	} else {
+		tolower_string(wt->titlebuff);
 		wt->has_title = true;
 	}
 	// NB: sometimes namebuff returns the previous name so that
@@ -102,6 +110,7 @@ void describe_window(HWND hWnd) {
 	if (strlen(wt->namebuff) < 1) {
 		strcpy(wt->namebuff, "[NO MODULE]");
 	} else {
+		tolower_string(wt->namebuff);
 		wt->has_name = true;
 	}
 
@@ -254,9 +263,13 @@ void do_launch_or_join_window() {
 	// else launch it
 	// useful for things like outlook and notepad which start multiple copies
 	char appname[BUF_SIZE];
+    char notepad_name[BUF_SIZE];
 	init_window_tracking(wt);   // Pointer to global shared variables
 	cin >> appname;
 	cout << "looking for " << appname << endl;
+	// strcpy(notepad_name, " start  \"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Accessories\\Notepad\"");
+	strcpy(notepad_name, " start  \"C:\\Windows\\system32\\Notepad.exe\"");
+	cout << "but all we have is " << notepad_name << endl;
 	wt->search_for_window = true;
 	wt->list_window = true; // for debugging
 	strcpy(wt->searchname, appname);
@@ -268,7 +281,11 @@ void do_launch_or_join_window() {
 					<< " xtras?" << endl;
 		}
 	} else {
-		cout << "we need to launch " << appname << endl;
+		cout << "we need to launch " << appname  << " and we have " << notepad_name << endl;
+		if ( appname[0] == 'N') {
+			// system(notepad_name);
+			system( " start Notepad");
+		}
 	}
 	system("pause");
 }

@@ -20,37 +20,39 @@ bool is_kill_target_window(const Window_Tracking *wt) {
 
 	// cout << "test  " << wt->titlebuff << " -- " << wt->namebuff << endl;
 
-	if (string_contains(wt->titlebuff, "Notepad"))
+	if (string_contains(wt->titlebuff, "notepad"))
 		is_kill_target = true;
-	else if (string_contains(wt->titlebuff, "Word"))
+	else if (string_contains(wt->titlebuff, "word"))
 		is_kill_target = true;
-	else if ((wt->titlebuff[0] == 'W') && (wt->titlebuff[1] == '\0')) {
+	else if ((wt->titlebuff[0] == 'w') && (wt->titlebuff[1] == '\0')) {
 		// cout << "this appears to be Word?" << endl;
 		is_kill_target = true;
-	} else if (string_contains(wt->titlebuff, "Explorer")) {
-		if (string_contains(wt->titlebuff, "File")) {
+	} else if (string_contains(wt->titlebuff, "explorer")) {
+		if (string_contains(wt->titlebuff, "file")) {
 			// if we kill File Explorer we lose the ribbon at the bottom
 			// what to do ??
 		} else
 			is_kill_target = true;
-	} else if (string_contains(wt->titlebuff, "Outlook"))
+	} else if (string_contains(wt->titlebuff, "outlook"))
 		is_kill_target = true;
-	else if (string_contains(wt->titlebuff, "Bing"))
+	else if (string_contains(wt->titlebuff, "bing"))
 		is_kill_target = true;
-	else if (string_contains(wt->titlebuff, "Edge"))
+	else if (string_contains(wt->titlebuff, "edge"))
 		is_kill_target = true;
-	else if (string_contains(wt->titlebuff, "Google"))
+	else if (string_contains(wt->titlebuff, "google"))
 		is_kill_target = true;
-	else if (string_contains(wt->titlebuff, "Microsoft"))
+	else if (string_contains(wt->titlebuff, "microsoft"))
 		is_kill_target = true;
-	else if (string_contains(wt->titlebuff, "Maps"))
+	else if (string_contains(wt->titlebuff, "maps"))
 		is_kill_target = true;
-	else if (string_contains(wt->titlebuff, "Command"))
+	else if (string_contains(wt->titlebuff, "command"))
 		is_kill_target = true;
+	else if (string_contains(wt->titlebuff, "ccleaner"))
+			is_kill_target = true;
 	// }
 	// if (wt->debug_commentary && is_kill_target) {
 	if (is_kill_target) {
-		cout << "special = " << wt->filename << " =  " << wt->titlebuff << endl;
+		cout << "kill special = " << wt->filename << " =  " << wt->titlebuff << endl;
 		// system("pause");
 	}
 
