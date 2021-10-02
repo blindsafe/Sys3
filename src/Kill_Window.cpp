@@ -62,19 +62,36 @@ bool is_kill_target_window(const Window_Tracking *wt) {
 bool kill_window(Window_Tracking *wt) {
 	//  kill the current window
 	int killed = false;
-	char syscmd[BUF_SIZE] = " taskkill /PID ";
-	strcat(syscmd, wt->filename);
-	strcat(syscmd, "  /F");
 
-	if (wt->debug_commentary) {
-		cout << "(**)Kill window " << wt->titlebuff << "==" << wt->namebuff
-				<< "with" << syscmd << endl;
-		system("pause");
+	/* if ( wt->debug_commentary) */ {
+		cout << endl  << "(**)Kill window " << wt->pid << wt->titlebuff << "==" << wt->namebuff<< endl;
+		// system("pause");
 	}
+
+#if 0 // command kill
+	{
+	char syscmd[BUF_SIZE] = " taskkill /PID ";
+		strcat(syscmd, wt->filename);
+		strcat(syscmd, "  /F");
 	system(syscmd);
-	if (wt->debug_commentary) {
-		cout << "and back" << endl;
-		system("pause");
+	}
+# else // api kill
+	{
+		HANDLE local_hWnd;
+		PostMessage(wt->current_window, WM_CLOSE, 0, 0);
+		Sleep(10);
+		local_hWnd = OpenProcess(PROCESS_TERMINATE, 0, wt->pid);
+		if ( local_hWnd ) {
+			TerminateProcess(local_hWnd, 0);
+			CloseHandle(local_hWnd);
+		}
+
+	}
+#endif
+
+	/* if (wt->debug_commentary) */ {
+		cout << "and back" << endl << endl;
+		// system("pause");
 	}
 	wt->win_killed_windows++;
 	killed = true;

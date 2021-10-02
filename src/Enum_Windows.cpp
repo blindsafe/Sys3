@@ -90,6 +90,7 @@ void describe_window(HWND hWnd) {
 	wt->is_blindsafe_window = false;
 	wt->is_kill_target = false;
 	wt->current_window = hWnd;
+	wt->pid = 0;
 	strcpy(wt->marks, "      ");
 
 	strcpy(wt->titlebuff, "");
@@ -157,15 +158,15 @@ void describe_window(HWND hWnd) {
 
 void do_window(HWND hWnd) {
 // everything below is stuff to with with the HWND we have in hand
-	long unsigned int pid = 0;
-	GetWindowThreadProcessId(hWnd, &pid);
-	string filename = to_string(pid);
+
+	GetWindowThreadProcessId(hWnd, &wt->pid);
+	string filename = to_string(wt->pid);
 	strcpy(wt->filename, &filename[0]);
 	if (wt->list_window) {
 		{
 			cout << std::setw(3) << std::dec << wt->win_count << "/"
 					<< std::setw(4) << std::dec << wt->win_total << "."
-					<< wt->marks << setw(10) << "pid= " << pid << std::hex
+					<< wt->marks << setw(10) << "pid= " <<wt->pid << std::hex
 					<< " = " << hWnd << " --> " << wt->titlebuff << " ==> "
 					<< wt->namebuff << endl;
 		}

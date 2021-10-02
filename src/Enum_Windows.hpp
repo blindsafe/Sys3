@@ -54,6 +54,7 @@ struct Window_Tracking {
 	 * Stuff about the current window
 	 */
 	HWND current_window;
+	long unsigned int pid = 0;
 	char titlebuff[BUF_SIZE];
 	char namebuff[BUF_SIZE];
 	char filename[BUF_SIZE];
