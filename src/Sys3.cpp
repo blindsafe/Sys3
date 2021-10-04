@@ -6,7 +6,7 @@
 
 #include "Sys3.hpp"
 
-struct Window_Tracking wtrk;
+struct Window_Tracking wtrk;  // this is it!! our global storage
 
 void say_blindsafe_help() {
 	// command list for the basic loop of main()
@@ -52,13 +52,11 @@ void do_developer_commands() {
 }
 
 BOOL am_i_in_already() {
+	// blindsafe itself at launch time will kill any of itself it finds already there
 	BOOL in_already_or_not = false;
-	cout << "am_i_in_alread?" << endl;
-	system("pause");
+	// we count of this being first thing in execution
 	init_window_tracking(&wtrk);   // Pointer to global shared variables
 	wtrk.search_for_window = true;
-	// wtrk.list_window = true; // for debugging
-
 	strcpy(wtrk.searchname, "blindsafe");
 	do_window_enum();
 	if (wtrk.search_window) {
@@ -74,19 +72,17 @@ int main(int argc, char *argv[]) {
 	bool accepting_commands = true;
 
 	if (am_i_in_already()) {
-#if 0
-		cout << "how do i switch over to " << wtrk.search_window << endl;
-		if (wtrk.extra_search_windows) {
-			cout << "and what do i do about the " << wtrk.extra_search_windows
-					<< " xtras?" << endl;
-		}
-#endif
+		// currently, last in is the one surviving.
+		// but maybe it should be first in, a kind of permanent resident
+		// with its own permanent memory of what its done
 		cout << "we only need one of me, so I killed my older brothers" << endl;
-		system("pause");
+//		system("pause");
 	}
 
 	while (accepting_commands) {
-		cout << "blindsafe 1.01 here: what is your wish? ('h' for help)" << endl
+		// bliindsafe takes in one letter commands and does its best
+		// to execute them until something causes an exit or shutdown
+		cout << "blindsafe 1.02 here: what is your wish? ('h' for help)" << endl
 				<< "-->";
 		strncpy(cmd, "h", 2);   // default entry is HELP
 		cin >> cmd;
@@ -95,8 +91,7 @@ int main(int argc, char *argv[]) {
 		if (command_char == 'h') { // help doesnt need to pause
 			say_blindsafe_help();
 		} else {
-			cout << "you said you wanted  " << cmd << "." << endl;
-			system("pause");
+			// cout << "you said you wanted  " << cmd << "." << endl;  system("pause");
 			switch (command_char) {
 			case 'c':  // cleanup
 			case 's':   // shutdown

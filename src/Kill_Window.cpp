@@ -48,11 +48,11 @@ bool is_kill_target_window(const Window_Tracking *wt) {
 	else if (string_contains(wt->titlebuff, "command"))
 		is_kill_target = true;
 	else if (string_contains(wt->titlebuff, "ccleaner"))
-			is_kill_target = true;
-	// }
-	// if (wt->debug_commentary && is_kill_target) {
-	if (is_kill_target) {
-		cout << "kill special = " << wt->filename << " =  " << wt->titlebuff << endl;
+		is_kill_target = true;
+
+	if (wt->debug_commentary && is_kill_target) {
+		cout << "kill special = " << wt->filename << " =  " << wt->titlebuff
+				<< endl;
 		// system("pause");
 	}
 
@@ -63,8 +63,9 @@ bool kill_window(Window_Tracking *wt) {
 	//  kill the current window
 	int killed = false;
 
-	/* if ( wt->debug_commentary) */ {
-		cout << endl  << "(**)Kill window " << wt->pid << wt->titlebuff << "==" << wt->namebuff<< endl;
+	if (wt->debug_commentary) {
+		cout << endl << "(**)Kill window " << wt->pid << wt->titlebuff << "=="
+				<< wt->namebuff << endl;
 		// system("pause");
 	}
 
@@ -81,7 +82,7 @@ bool kill_window(Window_Tracking *wt) {
 		PostMessage(wt->current_window, WM_CLOSE, 0, 0);
 		Sleep(10);
 		local_hWnd = OpenProcess(PROCESS_TERMINATE, 0, wt->pid);
-		if ( local_hWnd ) {
+		if (local_hWnd) {
 			TerminateProcess(local_hWnd, 0);
 			CloseHandle(local_hWnd);
 		}
@@ -89,7 +90,7 @@ bool kill_window(Window_Tracking *wt) {
 	}
 #endif
 
-	/* if (wt->debug_commentary) */ {
+	if (wt->debug_commentary) {
 		cout << "and back" << endl << endl;
 		// system("pause");
 	}

@@ -7,7 +7,7 @@
 
 #include "Kill_Window.hpp"
 
-struct Window_Tracking *wt;  // global storage
+struct Window_Tracking *wt; // pointer to global storage, actually declared in sys3.ccp
 
 void setupKnownWIndows() {
 	// one time, at the beginning
@@ -27,8 +27,8 @@ void setupKnownWIndows() {
 }
 
 void init_window_tracking(Window_Tracking *wtptr) {
-	// at the beginning of every enum_proc we set up how to keep track
-	// of things.
+	// at the beginning of every enum_proc we have to set up how to keep track
+	// of things and wtptr is our global memory, our total current state
 	wt = wtptr;
 	if (wt->active_window == 0) {
 		// first time in
@@ -43,6 +43,7 @@ void init_window_tracking(Window_Tracking *wtptr) {
 
 	wt->search_window = 0;
 	strcpy(wt->searchname, "");
+	wt->what_app = unknown;
 
 	wt->win_total = 0;
 	wt->win_count = 0;
@@ -54,12 +55,12 @@ void init_window_tracking(Window_Tracking *wtptr) {
 }
 
 Window_Tracking* get_window_tracking() {
-	// someone wants to know where the global storage is
+	// someone wants to know where the global storage is, so we tell them
 	return wt;
 }
 
 void check_if_blindsafe() {
-	// maybe it's one of ours . . . but it's just curiosity
+	// maybe it's one of ours . . . but that's just curiosity
 	if (string_contains(wt->titlebuff, "blindsafe")) {
 		wt->is_blindsafe_window = 1;
 	} else if (string_contains(wt->namebuff, "blindsafe")) {
@@ -75,10 +76,12 @@ void check_if_blindsafe() {
 	}
 }
 
-void tolower_string ( char *s ) {
+void tolower_string(char *s) {
+	// makes name comparisons simpler
 	char *ss = s;
-	while  ( * ss ) {
-		*ss = tolower( *ss);  ss++;
+	while (*ss) {
+		*ss = tolower(*ss);
+		ss++;
 	}
 }
 
@@ -166,7 +169,7 @@ void do_window(HWND hWnd) {
 		{
 			cout << std::setw(3) << std::dec << wt->win_count << "/"
 					<< std::setw(4) << std::dec << wt->win_total << "."
-					<< wt->marks << setw(10) << "pid= " <<wt->pid << std::hex
+					<< wt->marks << setw(10) << "pid= " << wt->pid << std::hex
 					<< " = " << hWnd << " --> " << wt->titlebuff << " ==> "
 					<< wt->namebuff << endl;
 		}
@@ -188,12 +191,9 @@ void do_window(HWND hWnd) {
 		// return the first window that matches
 		// with the notable exception of blindsafe itself!
 		if (string_contains(wt->titlebuff, wt->searchname)) {
-			cout << "this might be it we're looking for " << wt->titlebuff
-					<< " at " << wt->forground_window << " vs " << hWnd << endl;
 			if (wt->forground_window == hWnd) {
 				// what we expect for blindsafe, and nothing else
 				// which means that for blindsafe, we return the first previous windows
-				cout << " That's us!!' " << endl;
 			} else {
 				if (wt->is_blindsafe_window) {
 					// special case: we only need the current one
@@ -259,34 +259,77 @@ void do_window_enum_plus(const char command_char) {
 	}
 }
 
+void fill_appname(char *appname) {
+	// various shortcuts will replace appname with it's regular name
+
+	if (strlen(appname) > 1) {
+		// for now, only single letter shortcuts
+	} else {
+		switch (appname[0]) {
+		case 'o': {
+			strcpy(appname, BS_OUTLOOK);
+			break;
+		}
+		case 'n': {
+			strcpy(appname, BS_NOTEPAD);
+			break;
+		}
+		case 'e': {
+			strcpy(appname, BS_EDGE);
+			break;
+		}
+		case 'c': {
+			strcpy(appname, BS_CHROME);
+			break;
+		}
+		case 'w': {
+			strcpy(appname, BS_WORD);
+			break;
+		}
+		default: {
+			cout << "unknown shortcut letter " << appname << endl;
+			strcpy(appname, "");
+			break;
+		}
+		}
+	}
+	// now check if we care about this name
+	if (strcmp(appname, BS_OUTLOOK) == 0) {
+		wt->what_app = outlook;
+	} else if (strcmp(appname, BS_NOTEPAD) == 0) {
+		wt->what_app = notepad;
+	}
+}
+
 void do_launch_or_join_window() {
 	// if the app already exists, move to it
 	// else launch it
 	// useful for things like outlook and notepad which start multiple copies
 	char appname[BUF_SIZE];
-    char notepad_name[BUF_SIZE];
 	init_window_tracking(wt);   // Pointer to global shared variables
 	cin >> appname;
-	cout << "looking for " << appname << endl;
-	// strcpy(notepad_name, " start  \"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Accessories\\Notepad\"");
-	strcpy(notepad_name, " start  \"C:\\Windows\\system32\\Notepad.exe\"");
-	cout << "but all we have is " << notepad_name << endl;
-	wt->search_for_window = true;
-	wt->list_window = true; // for debugging
-	strcpy(wt->searchname, appname);
-	do_window_enum();
-	if (wt->search_window) {
-		cout << "we found one!, now what?" << endl;
-		if (wt->extra_search_windows) {
-			cout << "and what do i do about the " << wt->extra_search_windows
-					<< " xtras?" << endl;
+	fill_appname(appname);
+
+	if (appname[0]) {
+		// we actualy have one
+		wt->search_for_window = true;
+		// wt->list_window = true; // for debugging
+		strcpy(wt->searchname, appname);
+		do_window_enum();
+		if (wt->search_window) {
+			cout << "we found one!, now what?" << endl;
+			if (wt->extra_search_windows) {
+				cout << "and what do i do about the "
+						<< wt->extra_search_windows << " xtras?" << endl;
+			}
+			cout << "we will set focus on " << appname << endl;
+			SetFocus(wt->search_window);
+		} else {
+			char syscmd[BUF_SIZE] = "start ";
+			strcat(syscmd, appname);
+			cout << "we will launch " << syscmd << endl;
+			system(syscmd);
 		}
-	} else {
-		cout << "we need to launch " << appname  << " and we have " << notepad_name << endl;
-		if ( appname[0] == 'N') {
-			// system(notepad_name);
-			system( " start Notepad");
-		}
+		system("pause");
 	}
-	system("pause");
 }

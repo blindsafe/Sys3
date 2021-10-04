@@ -21,6 +21,20 @@ using namespace std;
 //	W_NO, W_YES, W_KILL, W_YES_DEFAULT
 //};
 
+// these apps get special attention from BlindSafe
+// and except for unknown, these defines should match the enum just below
+#define BS_OUTLOOK  "outlook"
+#define BS_NOTEPAD   "notepad"
+#define BS_EDGE          "edge"
+#define BS_CHROME   "chrome"
+#define BS_WORD        "word"
+
+enum launch_app {
+	outlook, notepad, edge, chrome, word, unknown
+};
+
+// this is effectively the global memory of blindsafe.
+// everything we need to know should be here
 struct Window_Tracking {
 	/*
 	 * Global variables directing actions
@@ -59,6 +73,7 @@ struct Window_Tracking {
 	char namebuff[BUF_SIZE];
 	char filename[BUF_SIZE];
 	char searchname[BUF_SIZE];
+	launch_app what_app = unknown;
 
 	// marks[1] = for developers, subject to change at whim
 	char marks[7] = { ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
@@ -66,7 +81,7 @@ struct Window_Tracking {
 	bool has_name = false;
 	bool is_kill_target = false;
 	bool is_blindsafe_window = false;
-    int extra_search_windows = 0;
+	int extra_search_windows = 0;
 };
 
 Window_Tracking* get_window_tracking();
