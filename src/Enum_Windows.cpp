@@ -7,6 +7,8 @@
 
 #include "Kill_Window.hpp"
 
+using namespace std;
+
 struct Window_Tracking *wt; // pointer to global storage, actually declared in sys3.ccp
 
 void setupKnownWIndows() {
@@ -16,13 +18,13 @@ void setupKnownWIndows() {
 	// if one of its subwindows has the focus, but it might or might not have focus itself.
 
 	wt->active_window = GetActiveWindow(); // top level window associated with focus
-	cout << "   Active Window    : " << std::setw(10) << std::hex
+	cout << "   Active Window    : " << std::setw(10) << std::hex // @suppress("Avoid magic numbers")
 			<< wt->active_window << endl;
 	wt->focus_window = GetFocus();
-	cout << "   Focus Window     : " << std::setw(10) << std::hex
+	cout << "   Focus Window     : " << std::setw(10) << std::hex // @suppress("Avoid magic numbers")
 			<< wt->focus_window << endl;
 	wt->forground_window = GetForegroundWindow();
-	cout << "   Foreground Window: " << std::setw(10) << std::hex
+	cout << "   Foreground Window: " << std::setw(10) << std::hex // @suppress("Avoid magic numbers")
 			<< wt->forground_window << endl;
 }
 
@@ -56,23 +58,23 @@ void init_window_tracking(Window_Tracking *wtptr) {
 
 Window_Tracking* get_window_tracking() {
 	// someone wants to know where the global storage is, so we tell them
-	return wt;
+	return (wt);
 }
 
 void check_if_blindsafe() {
 	// maybe it's one of ours . . . but that's just curiosity
 	if (string_contains(wt->titlebuff, "blindsafe")) {
-		wt->is_blindsafe_window = 1;
+		wt->is_blindsafe_window = true;
 	} else if (string_contains(wt->namebuff, "blindsafe")) {
-		wt->is_blindsafe_window = 1;
+		wt->is_blindsafe_window = true;
 	} else if (string_contains(wt->titlebuff, "github")) {
-		wt->is_blindsafe_window = 1;
+		wt->is_blindsafe_window = true;
 	} else if (string_contains(wt->namebuff, "github")) {
-		wt->is_blindsafe_window = 1;
+		wt->is_blindsafe_window = true;
 	}
 	if (wt->is_blindsafe_window) {
 		wt->win_blindsafe_windows++;
-		wt->marks[5] = 'G';
+		wt->marks[5] = 'G'; // @suppress("Avoid magic numbers")
 	}
 }
 
@@ -97,7 +99,8 @@ void describe_window(HWND hWnd) {
 	strcpy(wt->marks, "      ");
 
 	strcpy(wt->titlebuff, "");
-	GetWindowText(hWnd, (LPSTR) wt->titlebuff, sizeof(wt->titlebuff) - 1);
+	GetWindowText(hWnd, static_cast<LPSTR>(wt->titlebuff),
+			sizeof(wt->titlebuff) - 1);
 	if (strlen(wt->titlebuff) < 1) {
 		strcpy(wt->titlebuff, "[NO TITLE]");
 	} else {
@@ -168,8 +171,11 @@ void do_window(HWND hWnd) {
 	if (wt->list_window) {
 		{
 			cout << std::setw(3) << std::dec << wt->win_count << "/"
+					// @suppress("Avoid magic numbers")
 					<< std::setw(4) << std::dec << wt->win_total << "."
+					// @suppress("Avoid magic numbers")
 					<< wt->marks << setw(10) << "pid= " << wt->pid << std::hex
+					// @suppress("Avoid magic numbers")
 					<< " = " << hWnd << " --> " << wt->titlebuff << " ==> "
 					<< wt->namebuff << endl;
 		}
@@ -180,12 +186,8 @@ void do_window(HWND hWnd) {
 		system(syscmd);
 	}
 
-	if (wt->kill_window) {
-		if (wt->is_kill_target) {
-			kill_window(wt);
-		} else {
-			// leave sleeping dogs lie
-		}
+	if (wt->kill_window && wt->is_kill_target) {
+		kill_window(wt);
 	}
 	if (wt->search_for_window) {
 		// return the first window that matches
@@ -213,7 +215,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hWnd, long lParam) {
 	wt->win_total++;
 	describe_window(hWnd);
 	do_window(hWnd);
-	return TRUE;
+	return (TRUE);
 }
 
 bool do_window_enum() {
@@ -240,7 +242,7 @@ void do_window_enum_plus(const char command_char) {
 	case 'r':
 	case 'c': {
 		wt->list_window = true;
-		wt->kill_window = 1;
+		wt->kill_window = true;
 		do_window_enum();
 		switch (command_char) {
 		case 's': { // shutdown
@@ -252,6 +254,11 @@ void do_window_enum_plus(const char command_char) {
 			break;
 		}
 		case 'c': {
+			break;
+		}
+		default: {
+			cout << " unrecognized command '" << command_char << "', ignoring"
+					<< endl;
 			break;
 		}
 		}

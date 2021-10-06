@@ -12,7 +12,6 @@
 #include <windows.h>
 #include <iostream>
 #include <IOmanip>
-using namespace std;
 
 #define BUF_SIZE 256  // universal buffer character size for names and commands
 
@@ -76,7 +75,7 @@ struct Window_Tracking {
 	launch_app what_app = unknown;
 
 	// marks[1] = for developers, subject to change at whim
-	char marks[7] = { ' ', ' ', ' ', ' ', ' ', ' ', '\0' };
+	char marks[7] = { ' ', ' ', ' ', ' ', ' ', ' ', '\0' }; // @suppress("Avoid magic numbers")
 	bool has_title = false;
 	bool has_name = false;
 	bool is_kill_target = false;

@@ -11,7 +11,7 @@
 #include <windows.h>
 #include <iostream>
 #include <IOmanip>
-using namespace std;
+#include <string.h>
 
 #include "Enum_Windows.hpp"
 

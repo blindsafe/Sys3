@@ -8,8 +8,10 @@
 #include "Kill_Window.hpp"
 #include <cstring>
 
+using namespace std;
+
 bool string_contains(const char *target_string, const char *test_string) {
-	return !!(strstr(target_string, test_string));
+	return (!!(strstr(target_string, test_string)));
 }
 
 // is this a window we might want to kill?
@@ -31,6 +33,7 @@ bool is_kill_target_window(const Window_Tracking *wt) {
 		if (string_contains(wt->titlebuff, "file")) {
 			// if we kill File Explorer we lose the ribbon at the bottom
 			// what to do ??
+			cout << "Will not kill File Explorer!" << endl;
 		} else
 			is_kill_target = true;
 	} else if (string_contains(wt->titlebuff, "outlook"))
@@ -56,7 +59,7 @@ bool is_kill_target_window(const Window_Tracking *wt) {
 		// system("pause");
 	}
 
-	return is_kill_target;
+	return (is_kill_target);
 }
 
 bool kill_window(Window_Tracking *wt) {
@@ -69,26 +72,24 @@ bool kill_window(Window_Tracking *wt) {
 		// system("pause");
 	}
 
-#if 0 // command kill
+//#if 0 // command kill
+//	{
+//	char syscmd[BUF_SIZE] = " taskkill /PID ";
+//		strcat(syscmd, wt->filename);
+//		strcat(syscmd, "  /F");
+//	system(syscmd);
+//	}
+//# else // api kill
 	{
-	char syscmd[BUF_SIZE] = " taskkill /PID ";
-		strcat(syscmd, wt->filename);
-		strcat(syscmd, "  /F");
-	system(syscmd);
-	}
-# else // api kill
-	{
-		HANDLE local_hWnd;
 		PostMessage(wt->current_window, WM_CLOSE, 0, 0);
-		Sleep(10);
-		local_hWnd = OpenProcess(PROCESS_TERMINATE, 0, wt->pid);
+		Sleep(10); // @suppress("Avoid magic numbers")
+		HANDLE local_hWnd = OpenProcess(PROCESS_TERMINATE, 0, wt->pid);
 		if (local_hWnd) {
 			TerminateProcess(local_hWnd, 0);
 			CloseHandle(local_hWnd);
 		}
-
 	}
-#endif
+//#endif
 
 	if (wt->debug_commentary) {
 		cout << "and back" << endl << endl;
