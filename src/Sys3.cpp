@@ -80,11 +80,11 @@ void do_developer_commands() {
 			}
 		}
 	} // end of command loop
-}
+} // end do_developer_commands()
 
-BOOL am_i_in_already() {
+bool am_i_in_already() {
 	// blindsafe itself at launch time will kill any of itself it finds already there
-	BOOL in_already_or_not = false;
+	bool in_already_or_not = false;
 	// we count of this being first thing in execution
 	init_window_tracking(&wtrk);   // Pointer to global shared variables
 	wtrk.search_for_window = true;
@@ -96,10 +96,9 @@ BOOL am_i_in_already() {
 		in_already_or_not = true;
 	}
 	return (in_already_or_not);
-
 }
 
-#define APP_VERSION "1.0.2"
+#define APP_VERSION "1.0.4"
 
 int main(int argc, char *argv[]) {
 	cout << endl << "BlindSafe - Version " << APP_VERSION << endl;
@@ -159,4 +158,4 @@ int main(int argc, char *argv[]) {
 
 	cout << "That's all folks!" << endl;
 	return (1);
-}
+} // end of main()

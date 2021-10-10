@@ -234,14 +234,13 @@ bool do_window_enum() {
 }
 
 void do_window_enum_plus(const char command_char) {
-	// various commands want a tour, sometimes then followed by
-	// more to do
+	// various commands want a tour, sometimes then followed bymore to do
 	init_window_tracking(wt);   // Pointer to global shared variables
 	switch (command_char) {
 	case 's':
 	case 'r':
 	case 'c': {
-		wt->list_window = true;
+		//	wt->list_window = true;
 		wt->kill_window = true;
 		do_window_enum();
 		switch (command_char) {

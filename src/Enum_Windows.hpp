@@ -15,11 +15,6 @@
 
 #define BUF_SIZE 256  // universal buffer character size for names and commands
 
-// See https://www.geeksforgeeks.org/enumeration-enum-c/
-//enum Window_Type {
-//	W_NO, W_YES, W_KILL, W_YES_DEFAULT
-//};
-
 // these apps get special attention from BlindSafe
 // and except for unknown, these defines should match the enum just below
 #define BS_OUTLOOK  "outlook"

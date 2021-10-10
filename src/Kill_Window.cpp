@@ -19,9 +19,7 @@ bool is_kill_target_window(const Window_Tracking *wt) {
 	// by painful discovery, some windows aren't to be canceled
 	// but others definitely want to be!
 	bool is_kill_target = false;
-
 	// cout << "test  " << wt->titlebuff << " -- " << wt->namebuff << endl;
-
 	if (string_contains(wt->titlebuff, "notepad"))
 		is_kill_target = true;
 	else if (string_contains(wt->titlebuff, "word"))
@@ -32,8 +30,7 @@ bool is_kill_target_window(const Window_Tracking *wt) {
 	} else if (string_contains(wt->titlebuff, "explorer")) {
 		if (string_contains(wt->titlebuff, "file")) {
 			// if we kill File Explorer we lose the ribbon at the bottom
-			// what to do ??
-			cout << "Will not kill File Explorer!" << endl;
+			// cout << "Will not kill File Explorer!" << endl;
 		} else
 			is_kill_target = true;
 	} else if (string_contains(wt->titlebuff, "outlook"))
@@ -52,51 +49,38 @@ bool is_kill_target_window(const Window_Tracking *wt) {
 		is_kill_target = true;
 	else if (string_contains(wt->titlebuff, "ccleaner"))
 		is_kill_target = true;
+	else if (string_contains(wt->titlebuff, "chrome"))
+			is_kill_target = true;
 
 	if (wt->debug_commentary && is_kill_target) {
-		cout << "kill special = " << wt->filename << " =  " << wt->titlebuff
+		cout << "is_kill_target = " << wt->filename << " =  " << wt->titlebuff
 				<< endl;
 		// system("pause");
 	}
-
 	return (is_kill_target);
-}
+}  // end is_kill_target()
 
 bool kill_window(Window_Tracking *wt) {
 	//  kill the current window
 	int killed = false;
-
-	if (wt->debug_commentary) {
+	// if (wt->debug_commentary)
+	{
 		cout << endl << "(**)Kill window " << wt->pid << wt->titlebuff << "=="
 				<< wt->namebuff << endl;
 		// system("pause");
 	}
-
-//#if 0 // command kill
-//	{
-//	char syscmd[BUF_SIZE] = " taskkill /PID ";
-//		strcat(syscmd, wt->filename);
-//		strcat(syscmd, "  /F");
-//	system(syscmd);
-//	}
-//# else // api kill
-	{
-		PostMessage(wt->current_window, WM_CLOSE, 0, 0);
-		Sleep(10); // @suppress("Avoid magic numbers")
-		HANDLE local_hWnd = OpenProcess(PROCESS_TERMINATE, 0, wt->pid);
-		if (local_hWnd) {
-			TerminateProcess(local_hWnd, 0);
-			CloseHandle(local_hWnd);
-		}
+	PostMessage(wt->current_window, WM_CLOSE, 0, 0);
+	Sleep(10); // @suppress("Avoid magic numbers")
+	HANDLE local_hWnd = OpenProcess(PROCESS_TERMINATE, 0, wt->pid);
+	if (local_hWnd) {
+		TerminateProcess(local_hWnd, 0);
+		CloseHandle(local_hWnd);
 	}
-//#endif
-
 	if (wt->debug_commentary) {
 		cout << "and back" << endl << endl;
 		// system("pause");
 	}
 	wt->win_killed_windows++;
 	killed = true;
-
-	return !!killed;
+	return killed;
 }
