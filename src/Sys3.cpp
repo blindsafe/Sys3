@@ -26,7 +26,7 @@ void say_blindsafe_help() {
 
 void do_developer_commands() {
 	//separate  workbench/playground for developers to test things
-	cout << "Developer Mode, use q to return to main loop" << endl;
+	cout << "rogue Developer Mode, use q to return to main loop" << endl;
 
 	char cmd[BUF_SIZE] = { 'x', '\0' };
 	bool accepting_commands = true;
