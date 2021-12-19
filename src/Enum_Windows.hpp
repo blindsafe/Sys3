@@ -18,13 +18,17 @@
 // these apps get special attention from BlindSafe
 // and except for unknown, these defines should match the enum just below
 #define BS_OUTLOOK  "outlook"
-#define BS_NOTEPAD   "notepad"
-#define BS_EDGE          "edge"
+#define BS_NOTEPAD  "notepad"
+#define BS_EDGE     "edge"
 #define BS_CHROME   "chrome"
-#define BS_WORD        "word"
+#define BS_WORD     "word"
 
 enum launch_app {
 	outlook, notepad, edge, chrome, word, unknown
+};
+
+enum blind_op {
+	bl_clean, bl_debug, bl_help, bl_launch, bl_quit, bl_restart,  bl_shutdown
 };
 
 // this is effectively the global memory of blindsafe.
@@ -33,22 +37,22 @@ struct Window_Tracking {
 	/*
 	 * Global variables directing actions
 	 */
-	bool list_window = false;
-	bool show_window = false;
-	bool kill_window = false;
-	bool debug_commentary = false;
-	bool search_for_window = false;
+	bool list_window = false;        // put short description into listfile
+	bool show_window = false;        // put full detail into listfile
+	bool kill_window = false;        // kill the process
+	bool debug_commentary = false;   // say what we're doing
+	bool search_for_window = false;  // we're actively looking for this window
 
 	/*
 	 * Global variables tracking  window counts
 	 */
-	int win_total = 0;                    // everything returned by enum_proc()
-	int win_count = 0;                    // have both text and name
-	int win_mixed = 0;                    // have one or the other
-	int win_hidden_count = 0;             // there but not seen
-	int win_blindsafe_windows = 0;   // kludge cause blindsafe has lots of stuff
-	int win_killed_windows = 0;           // killed
-	int win_saved_windows = 0;            // not killed by special intervention
+	int win_total = 0;             // everything returned by enum_proc()
+	int win_count = 0;             // have both text and name
+	int win_mixed = 0;             // have one or the other
+	int win_hidden_count = 0;      // there but not seen
+	int win_blindsafe_windows = 0; // kludge cause blindsafe has lots of stuff
+	int win_killed_windows = 0;    // killed
+	int win_saved_windows = 0;     // not killed by special intervention
 
 	/*
 	 * Global variables tracking window status
@@ -88,7 +92,7 @@ BOOL CALLBACK EnumWindowsProc(const HWND hWnd, const long lParam);
 
 bool do_window_enum();
 
-void do_window_enum_plus(const char command_char);
+void do_window_enum_plus(blind_op use_cmd);
 
 void do_launch_or_join_window();
 

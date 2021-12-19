@@ -6,26 +6,53 @@
 
 #include "Sys3.hpp"
 
+
 using namespace std;
 
 struct Window_Tracking wtrk;  // this is it!! our global storage
 
+
+
 void say_blindsafe_help() {
 	// command list for the basic loop of main()
 	cout << endl;
-	cout << "blindSafe help" << endl << endl;
-	cout << " 'h' for help" << endl;
-	cout << " 's'  for shutdown, closing all windows" << endl;
-	cout << " 'r'  for reboot , closing all windows" << endl;
-	cout << " 'c'  for cleanup, closing all windows" << endl;
-	cout << "' l'  for launch or join an app" << endl;
-	cout << " 'e'  exit blindSafe" << endl;
-	cout << " 'd'  for a developer, doing who knows what!!" << endl;
-	cout << endl;
+	cout << "blindSafe help menu, type first letter:" << endl;
+	cout << " help" << endl;
+	cout << " shutdown closing all windows" << endl;
+	cout << " reboot closing all windows" << endl;
+	cout << " cleanup closing all windows" << endl;
+	cout << " launch or join an app" << endl;
+	cout << " quit blindSafe" << endl;
+	cout << " debug, allowing a develor to do who knows what!!" << endl;
+}
+
+blind_op blind_help_char_to_op( const char command_char) {
+	// hardcoded input character to blind_op
+	// bl_clean, bl_debug, bl_help, bl_launch, bl_quit, bl_restart,  bl_shutdown
+
+	blind_op rtn;
+	// cout << "blind_help_char_to_op('" << command_char <<"')";
+
+	switch ( command_char) {
+	case 'c': { rtn = bl_clean; break; }
+	case 'd': { rtn = bl_debug; break; }
+	case 'h': { rtn = bl_help; break; }
+	case 'l': { rtn = bl_launch; break; }
+	case 'q': { rtn = bl_quit; break; }
+	case 'r': { rtn = bl_restart; break; }
+	case 's': { rtn = bl_shutdown; break; }
+	default: {
+		cout << "unknown command" << endl;
+		rtn = bl_help; break; }
+	}
+	// cout << " returns " << (int)rtn << endl;
+	return (rtn);
 }
 
 void do_developer_commands() {
 	//separate  workbench/playground for developers to test things
+	// primitive coding to be modified, altered, discarded at the
+	// whim of whoever's in charge
 	cout << "rogue Developer Mode, use q to return to main loop" << endl;
 
 	char cmd[BUF_SIZE] = { 'x', '\0' };
@@ -46,11 +73,11 @@ void do_developer_commands() {
 				accepting_commands = false;
 				break;
 			}
-			case 'x': {  // help for developers
+			case 'h': {  // help for developers
 				cout << endl;
 				cout << "---- blindSafe developer help ----" << endl << endl;
 				cout << " 'q'  for returning to blindSafe main loop" << endl;
-				cout << " 'x'  for help" << endl;
+				cout << " 'h'  for help" << endl;
 				cout << " 's'  for system command" << endl;
 				cout << " 'd'  for setting debug mode to true" << endl;
 				cout << " 'n'  for setting debug mode to false" << endl;
@@ -82,6 +109,34 @@ void do_developer_commands() {
 	} // end of command loop
 } // end do_developer_commands()
 
+void do_blind_safe_cmd( blind_op use_cmd) {
+	// main executor of all blind_safe operations
+	bool do_pause = false;
+	// cout << "do_blind_safe_cmd(" << (int) use_cmd << ")\n";
+	switch ( use_cmd ) {
+	case bl_help: {
+		say_blindsafe_help();
+		do_pause = false;
+		break; }
+	case bl_shutdown:
+	case bl_restart:
+	case bl_clean: {
+		do_window_enum_plus(use_cmd);
+		break; }
+	case bl_launch: {
+		do_launch_or_join_window();
+		break; };
+	case bl_quit: {
+		do_launch_or_join_window();
+		break; }
+	case bl_debug: {
+		cout << "DEVEOPER? who are you trying to kid?" << endl;
+		do_developer_commands();
+		break; }
+	}
+	if (do_pause)system("pause");
+}
+
 bool am_i_in_already() {
 	// blindsafe itself at launch time will kill any of itself it finds already there
 	bool in_already_or_not = false;
@@ -98,7 +153,7 @@ bool am_i_in_already() {
 	return (in_already_or_not);
 }
 
-#define APP_VERSION "1.0.4"
+#define APP_VERSION "1.0.5"
 
 int main(int argc, char *argv[]) {
 	cout << endl << "BlindSafe - Version " << APP_VERSION << endl;
@@ -120,40 +175,13 @@ int main(int argc, char *argv[]) {
 		cout << endl << "blindSafe: what is your wish? ('h' for help)" << endl
 				<< "--> ";
 		strncpy(cmd, "h", 2);   // default entry is HELP
-		cin >> cmd;
+	//	cin >> cmd;
+		memset(cmd, 0, sizeof(cmd));
+		std::cin.getline(cmd, BUF_SIZE);
 		const char command_char = cmd[0];
+		blind_op use_cmd = blind_help_char_to_op( command_char);
+		do_blind_safe_cmd( use_cmd);
 
-		if (command_char == 'h') { // help doesnt need to pause
-			say_blindsafe_help();
-		} else {
-			switch (command_char) {
-			case 'c':    // cleanup
-			case 's':    // shutdown
-			case 'r': {  // reboot
-				do_window_enum_plus(command_char);
-				break;
-			}
-			case 'e': {  // exit
-				accepting_commands = false;
-				break;
-			}
-			case 'l': {  // launch or join
-				do_launch_or_join_window();
-				break;
-			}
-			case 'd': {  // for developers
-				cout << "DEVEOPER? who are you trying to kid?" << endl;
-				do_developer_commands();
-				break;
-			}
-			default: {  // whatever
-				cout << "don't tnow what you mean  by '" << cmd << "'" << endl;
-				system("pause");
-				say_blindsafe_help();
-				break;
-			}
-			}
-		} // end of command switch
 	} // end main command loop
 
 	cout << "That's all folks!" << endl;

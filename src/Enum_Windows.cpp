@@ -233,35 +233,27 @@ bool do_window_enum() {
 	return result;
 }
 
-void do_window_enum_plus(const char command_char) {
+void c(blind_op use_cmd) {
 	// various commands want a tour, sometimes then followed bymore to do
 	init_window_tracking(wt);   // Pointer to global shared variables
-	switch (command_char) {
-	case 's':
-	case 'r':
-	case 'c': {
+	switch (use_cmd) {
+	case bl_shutdown:
+	case bl_restart:
+	case bl_clean: {
 		//	wt->list_window = true;
 		wt->kill_window = true;
 		do_window_enum();
-		switch (command_char) {
-		case 's': { // shutdown
+
+		if ( use_cmd == bl_shutdown) { // shutdown
 			system("shutdown /s /f /t 0");
-			break;
 		}
-		case 'r': {
+		else if (use_cmd == bl_restart) {
 			system("shutdown /r /f /t 0");
-			break;
 		}
-		case 'c': {
-			break;
-		}
-		default: {
-			cout << " unrecognized command '" << command_char << "', ignoring"
-					<< endl;
-			break;
-		}
-		}
-	}
+		break; }
+	case bl_help: case bl_launch: case bl_quit: case bl_debug: {
+		// avoid the compiler warn
+		break; }
 	}
 }
 
