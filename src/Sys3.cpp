@@ -55,7 +55,7 @@ void do_developer_commands() {
 	// whim of whoever's in charge
 	cout << "rogue Developer Mode, use q to return to main loop" << endl;
 
-	char cmd[BUF_SIZE] = { 'x', '\0' };
+	char cmd[BUF_SIZE];  // why ? = { 'x', '\0' };
 	bool accepting_commands = true;
 	while (accepting_commands) {
 		cout << endl << "developer_command --> ";
@@ -69,6 +69,13 @@ void do_developer_commands() {
 			cout << "Nothing entered!" << endl;
 		} else {
 			switch (command_char) {
+			case 'x': {  // try launching amazon
+				char amazon[] = "chrome.exe";
+				cout << "we will try " << amazon << endl;
+				int r = system(amazon);
+			    cout << "-- RC: " << r << " --" << endl;
+				break;
+			}
 			case 'q': {  // back to blindsafe main loop
 				accepting_commands = false;
 				break;
@@ -153,7 +160,7 @@ bool am_i_in_already() {
 	return (in_already_or_not);
 }
 
-#define APP_VERSION "1.0.5"
+#define APP_VERSION "1.0.6"
 
 int main(int argc, char *argv[]) {
 	cout << endl << "BlindSafe - Version " << APP_VERSION << endl;

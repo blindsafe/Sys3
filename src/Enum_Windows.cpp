@@ -233,7 +233,7 @@ bool do_window_enum() {
 	return result;
 }
 
-void c(blind_op use_cmd) {
+void do_window_enum_plus(blind_op use_cmd) {
 	// various commands want a tour, sometimes then followed bymore to do
 	init_window_tracking(wt);   // Pointer to global shared variables
 	switch (use_cmd) {
