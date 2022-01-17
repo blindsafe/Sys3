@@ -17,13 +17,13 @@ void say_blindsafe_help() {
 	// command list for the basic loop of main()
 	cout << endl;
 	cout << "blindSafe help menu, type first letter:" << endl;
-	cout << " help" << endl;
-	cout << " shutdown closing all windows" << endl;
-	cout << " reboot closing all windows" << endl;
-	cout << " cleanup closing all windows" << endl;
-	cout << " launch or join an app" << endl;
-	cout << " quit blindSafe" << endl;
-	cout << " debug, allowing a develor to do who knows what!!" << endl;
+	cout << " Help" << endl;
+	cout << " Shutdown closing all windows" << endl;
+	cout << " Reboot closing all windows" << endl;
+	cout << " Cleanup closing all windows" << endl;
+	cout << " Launch or join an app" << endl;
+	cout << " Quit blindSafe" << endl;
+	cout << " Debug, allowing a developer to do who knows what!!" << endl;
 }
 
 blind_op blind_help_char_to_op( const char command_char) {
@@ -33,7 +33,7 @@ blind_op blind_help_char_to_op( const char command_char) {
 	blind_op rtn;
 	// cout << "blind_help_char_to_op('" << command_char <<"')";
 
-	switch ( command_char) {
+	switch ( tolower(command_char)) {
 	case 'c': { rtn = bl_clean; break; }
 	case 'd': { rtn = bl_debug; break; }
 	case 'h': { rtn = bl_help; break; }
